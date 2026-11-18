@@ -1,0 +1,5 @@
+<%- include('partials/start') %>
+<h1 class="text-3xl font-bold">Delete <%= module.label %>?</h1>
+<p class="mt-3">This removes <strong><%= row.title_en||row.name_en||row.alt_text_en %></strong><%= row.images?' and all its image entries':'' %><%= row.features?' and all its features':'' %><%= module.model==='serviceCategory'?'. Core Activities remain, with their category cleared':'' %>. Unreferenced files are removed. This cannot be undone.</p>
+<form class="mt-6" method="post" action="<%= path %>/<%= row.id %>/delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="revision" value="<%= row.revision %>"><button class="button-primary" type="submit">Delete</button><a class="button-secondary" href="<%= path %>">Cancel</a></form>
+<%- include('partials/end') %>

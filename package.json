@@ -1,0 +1,51 @@
+{
+  "name": "nahuda-sewa",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Nahuda Sewa bilingual organization website — Admin authentication foundation",
+  "engines": {
+    "node": ">=24.0.0 <25"
+  },
+  "scripts": {
+    "dev": "npm run build:css && node --watch src/server.js",
+    "start": "node src/server.js",
+    "build": "npm run build:css",
+    "build:css": "tailwindcss -i src/styles/app.css -o public/assets/css/app.css --minify",
+    "watch:css": "tailwindcss -i src/styles/app.css -o public/assets/css/app.css --watch",
+    "test": "node --test test/*.test.js",
+    "db:validate": "prisma validate",
+    "db:check": "node scripts/check-database.js",
+    "db:generate": "prisma generate",
+    "db:migrate": "node scripts/migrate-local.js",
+    "db:status": "prisma migrate status",
+    "admin:create": "node scripts/create-admin.js",
+    "admin:setup": "powershell -NoProfile -File scripts/setup-admin.ps1",
+    "auth:prune": "node scripts/prune-auth.js",
+    "test:integration": "node scripts/test-integration.js"
+  },
+  "dependencies": {
+    "@prisma/adapter-mariadb": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "dotenv": "18.0.4",
+    "ejs": "6.0.1",
+    "express": "5.2.1",
+    "express-session": "1.19.0",
+    "multer": "2.5.0",
+    "sanitize-html": "2.18.1",
+    "sharp": "0.35.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.5",
+    "prisma": "7.10.1",
+    "tailwindcss": "4.3.3"
+  },
+  "overrides": {
+    "@prisma/config": {
+      "deepmerge-ts": "8.0.2"
+    },
+    "prisma": {
+      "mysql2": "3.24.4"
+    }
+  }
+}

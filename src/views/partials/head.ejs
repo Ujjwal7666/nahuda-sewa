@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="<%= locale %>">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="<%= typeof robots === 'string' ? robots : 'index, follow' %>">
+  <title><%= title %></title>
+  <% const pageSeo=typeof seo==='undefined'?{}:seo; const pageDescription=pageSeo.description||organization.site_description; %>
+  <% if (pageDescription) { %><meta name="description" content="<%= pageDescription %>"><% } %>
+  <% if(pageSeo.canonical) { %><link rel="canonical" href="<%= pageSeo.canonical %>"><link rel="alternate" hreflang="en" href="<%= pageSeo.en %>"><link rel="alternate" hreflang="ne" href="<%= pageSeo.ne %>"><link rel="alternate" hreflang="x-default" href="<%= pageSeo.en %>"><meta property="og:url" content="<%= pageSeo.canonical %>"><% } %>
+  <meta property="og:title" content="<%= title %>">
+  <% if (pageDescription) { %><meta property="og:description" content="<%= pageDescription %>"><% } %>
+  <% if (pageSeo.image || organization.sharing_image) { %><meta property="og:image" content="<%= publicOrigin + (pageSeo.image || organization.sharing_image) %>"><% } %>
+  <% if (organization.favicon) { %><link rel="icon" href="<%= organization.favicon %>" type="image/png"><% } else if (organization.primary_logo) { %><link rel="icon" href="<%= organization.primary_logo %>"><% } %>
+  <link rel="stylesheet" href="/assets/css/app.css">
+  <script src="/assets/js/app.js" defer></script>
+</head>
+<body>

@@ -1,0 +1,11 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main" class="page-width organization-page media-page <%= key==='news'?'news-page':'' %>" tabindex="-1">
+<header class="organization-heading"><p class="eyebrow"><%= t.media %></p><h1><%= heading %></h1><% if(key==='news'&&!row) { %><p class="news-list-intro"><%= labels.intro %></p><% } %></header>
+<nav class="organization-links" aria-label="<%= t.media %>"><% for(const item of ['news','gallery','testimonials']) { %><a class="button-secondary" href="<%= localePrefix+'/'+item %>" <%= item===key?'aria-current=page':'' %>><%= t[item] %></a><% } %></nav>
+<% if(row) { %><%- include('news/news-detail') %>
+<% } else if(!rows.length) { %><p class="<%= key==='news'?'news-empty':'form-alert' %>"><%= labels.empty %></p>
+<% } else if(key==='news') { %><div class="news-card-grid"><% for(const news of rows) { %><%- include('news/news-card',{news}) %><% } %></div>
+<% } else { %><div class="media-card-grid"><% for(const testimonial of rows) { %><figure class="organization-card testimonial-card"><blockquote class="preserve-lines"><%= contentText(testimonial,'testimonial',locale) %></blockquote><figcaption><% if(testimonial.photo) { %><img src="<%= assetUrl(testimonial.photo) %>" alt="<%= contentText(testimonial,'name',locale) %>" width="<%= testimonial.photo.width %>" height="<%= testimonial.photo.height %>" loading="lazy"><% } %><div><strong><%= contentText(testimonial,'name',locale) %></strong><% if(contentText(testimonial,'position_organization',locale)) { %><p class="text-muted"><%= contentText(testimonial,'position_organization',locale) %></p><% } %></div></figcaption></figure><% } %></div><% } %>
+</main>
+<%- include('../partials/footer') %>

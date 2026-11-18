@@ -1,0 +1,3 @@
+<% if(programImages.length) { %><section class="activity-supporting-images" aria-label="<%= locale==='ne'?'हाम्रो कामका तस्बिरहरू':'Our Work gallery' %>"><div class="activity-gallery <%= programImages.length===1?'activity-gallery-single':'' %>">
+<% for(const image of programImages) { %><figure><a href="<%= assetUrl(image.image) %>"><img src="<%= assetUrl(image.image) %>" alt="<%= contentText(image,'alt_text',locale)||contentText(row,'title',locale) %>" width="<%= image.image.width %>" height="<%= image.image.height %>" loading="lazy" decoding="async"></a><% if(contentText(image,'caption',locale).trim()) { %><figcaption class="preserve-lines"><%= contentText(image,'caption',locale) %></figcaption><% } %></figure><% } %>
+</div></section><% } %>

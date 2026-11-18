@@ -1,0 +1,3 @@
+<% if(!albums.length) { %><p class="form-alert"><%= labels.empty %></p><% } else { %>
+<div class="gallery-albums"><% for(const [index,item] of albums.entries()) { %><%- include('album-card',{item,index}) %><% } %></div>
+<% } %>

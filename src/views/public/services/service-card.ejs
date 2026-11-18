@@ -1,0 +1,9 @@
+<article class="organization-card service-card">
+<a class="service-card-link" href="<%= localePrefix+'/services/'+service.slug %>" aria-labelledby="service-title-<%= service.id %>">
+<div class="service-card-image"><% if(service.featured_image) { %><img src="<%= assetUrl(service.featured_image) %>" alt="" width="<%= service.featured_image.width %>" height="<%= service.featured_image.height %>" loading="lazy" decoding="async"><% if(service.icon) { %><span class="activity-card-icon" aria-hidden="true"><%= service.icon %></span><% } %><% } else { %><div class="activity-card-art" aria-hidden="true"><span><%= service.icon||'✦' %></span></div><% } %></div>
+<div class="service-card-body">
+<% const cardCategory=category||service.category; if(cardCategory?.is_active) { %><p class="activity-card-category"><%= contentText(cardCategory,'name',locale) %></p><% } %>
+<h<%= cardHeadingLevel %> id="service-title-<%= service.id %>"><%= contentText(service,'name',locale) %></h<%= cardHeadingLevel %>>
+<% if(contentText(service,'short_description',locale)) { %><p class="preserve-lines service-card-description"><%= contentText(service,'short_description',locale) %></p><% } %>
+<span class="text-link service-card-cta"><%= labels.read %><span aria-hidden="true"> →</span></span>
+</div></a></article>

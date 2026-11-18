@@ -1,0 +1,12 @@
+<%- include('partials/start') %>
+<h1 class="text-3xl font-bold mt-3">Contact / Feedback</h1><p class="text-muted mt-2">View messages and mark them as read.</p>
+<form method="get" class="contact-filter"><label for="status">Status</label><select id="status" name="status"><option value="">All</option><option value="NEW" <%= status==='NEW'?'selected':'' %>>New</option><option value="READ" <%= status==='READ'?'selected':'' %>>Read</option></select><button class="button-secondary">Filter</button></form>
+<p class="text-muted"><%= count %> messages</p>
+<div class="contact-message-list"><% for(const row of rows) { %><article class="contact-card">
+  <span class="contact-status <%= row.status==='NEW'?'contact-status-new':'' %>"><%= row.status==='NEW'?'New':'Read' %></span>
+  <h2><a class="text-link" href="/admin/messages/contact-feedback/<%= row.id %>"><%= row.subject %> →</a></h2>
+  <dl class="contact-details"><% for(const [label,value] of [['Name',row.name],['Email',row.email],['Phone',row.phone||'—'],['Submitted (UTC)',row.submitted_at.toISOString().replace('T',' ').slice(0,19)]]) { %><div><dt><%= label %></dt><dd><%= value %></dd></div><% } %></dl>
+</article><% } %></div>
+<% if(!rows.length) { %><p class="form-alert">No messages to show.</p><% } %>
+<nav class="contact-pagination" aria-label="Message pages"><% if(page>1) { %><a class="text-link" href="?page=<%= page-1 %>&amp;status=<%= status %>">← Previous</a><% } %><span>Page <%= page %></span><% if(page*20<count) { %><a class="text-link" href="?page=<%= page+1 %>&amp;status=<%= status %>">Next →</a><% } %></nav>
+<%- include('partials/end') %>

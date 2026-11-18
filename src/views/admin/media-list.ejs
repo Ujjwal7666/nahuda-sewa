@@ -1,0 +1,14 @@
+<%- include('partials/start') %>
+<h1 class="text-3xl font-bold"><%= module.label %></h1>
+<% if(saved) { %><p class="form-alert" role="status">Changes saved.</p><% } %>
+<a class="button-primary mt-6" href="<%= path %>/<%= module.model==='galleryImage'?'add':'new' %>"><%= module.model==='galleryImage'?'Add Images':'Add '+module.label %></a>
+<% if(parentPath) { %><a class="button-secondary mt-6" href="<%= parentPath %>">Back to parent</a><% } else { %><a class="button-secondary mt-6" href="<%= module.publicPath %>">View public page</a><% } %>
+<% if(['serviceImage','programImage'].includes(module.model)) { %><p class="text-muted mt-3">Supporting images appear after the activity article. Add images one at a time, edit optional bilingual captions/alt text and display order, or delete an image with confirmation. Lower orders appear first; ties use record ID.</p><% } %>
+<% if(!rows.length) { %><p class="form-alert">No entries added yet.</p><% } %>
+<% if(module.model==='galleryImage') { %><p class="text-muted mt-3">Each photo belongs to this album. Edit its caption, descriptions or optional credit, replace/remove it, or change its order below.</p><%- include('gallery-image-grid',{galleryImages:rows,imagePath:path}) %><% } else { %><div class="content-admin-list"><% for(const row of rows) { %><article>
+<% if(row[module.asset]) { %><img src="<%= assetUrl(row[module.asset]) %>" width="120" height="120" alt="<%= row.alt_text_en||row.title_en||row.name_en %>"><% } %>
+<% if(['serviceImage','programImage'].includes(module.model)) { %><h2><%= row.caption_en||row.alt_text_en||'Supporting image' %><% if(row.caption_ne||row.alt_text_ne) { %> / <span lang="ne"><%= row.caption_ne||row.alt_text_ne %></span><% } %></h2><% } else { %><h2><%= row.title_en||row.name_en||row.alt_text_en %> / <span lang="ne"><%= row.title_ne||row.name_ne||row.alt_text_ne %></span></h2><% } %>
+<p><%= module.service && row.is_featured?'Featured · ':'' %><%= module.news?row.status:module.visibility?(row.is_active?'Active':'Inactive'):'' %><%= module.ordered?' · Order: '+row.display_order:'' %><%= module.date?' · '+dateInput(row[module.date]):'' %></p>
+<div class="content-actions"><% if(module.program) { %><a class="text-link" href="<%= path %>/<%= row.id %>/view">View / Preview</a><% } %><% if(['serviceImage','programImage'].includes(module.model) && row.image) { %><a class="text-link" href="<%= assetUrl(row.image) %>">View full image</a><% } %><a class="text-link" href="<%= path %>/<%= row.id %>/edit">Edit</a><a class="text-link" href="<%= path %>/<%= row.id %>/delete">Delete</a><% if(row.features) { %><a class="text-link" href="<%= path %>/<%= row.id %>/features">Manage features (<%= row.features.length %>)</a><% } %><% if(row.images) { %><a class="text-link" href="<%= path %>/<%= row.id %>/images">Manage images (<%= row.images.length %>)</a><% } %></div>
+</article><% } %></div><% } %>
+<%- include('partials/end') %>

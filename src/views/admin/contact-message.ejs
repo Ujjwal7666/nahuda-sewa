@@ -1,0 +1,10 @@
+<%- include('partials/start') %>
+<a class="text-link" href="/admin/messages/contact-feedback">← Contact / Feedback</a>
+<h1 class="text-3xl font-bold mt-3"><%= entry.subject %></h1>
+<% if(saved) { %><p class="form-alert" role="status">Message marked as read.</p><% } %>
+<section class="contact-card mt-6"><h2>Message details</h2>
+  <dl class="contact-details"><% for(const [label,value] of [['Name',entry.name],['Email',entry.email],['Phone',entry.phone||'—'],['Subject',entry.subject],['Submitted (UTC)',entry.submitted_at.toISOString().replace('T',' ').slice(0,19)],['Status',entry.status==='NEW'?'New':'Read']]) { %><div><dt><%= label %></dt><dd><%= value %></dd></div><% } %></dl>
+  <h3 class="mt-6 font-semibold">Full message</h3><p class="preserve-lines contact-message-body"><%= entry.message %></p>
+  <% if(entry.status==='NEW') { %><form method="post" action="/admin/messages/contact-feedback/<%= entry.id %>/status" class="mt-6"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status" value="READ"><button class="button-primary">Mark as Read</button></form><% } %>
+</section>
+<%- include('partials/end') %>

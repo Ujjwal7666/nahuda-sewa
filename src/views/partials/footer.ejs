@@ -1,0 +1,19 @@
+<% const labels = locale === 'ne' ? {contact:'सम्पर्क', social:'सामाजिक सञ्जाल', map:'नक्सामा हेर्नुहोस्'} : {contact:'Contact',social:'Social media',map:'View on Google Maps'}; %>
+<footer class="site-footer"><div class="page-width">
+  <div class="footer-grid">
+    <div><div class="identity"><% if (organization.footer_logo) { %><img src="<%= organization.footer_logo %>" width="60" height="60" alt="" class="brand-logo footer-logo"><% } %><strong><%= name %></strong></div>
+    <% if (organization.footer_description) { %><p class="preserve-lines mt-4"><%= organization.footer_description %></p><% } %></div>
+    <% if (organization.primary_email || organization.secondary_email || organization.phone || organization.whatsapp || organization.address || organization.city || organization.country || organization.map_url) { %>
+    <section><h2><%= labels.contact %></h2><ul class="footer-links">
+      <% for (const email of [organization.primary_email, organization.secondary_email].filter(Boolean)) { %><li><a href="mailto:<%= email %>"><%= email %></a></li><% } %>
+      <% if (organization.phone) { %><li><a href="tel:<%= organization.phone.replace(/[^+\d]/g, '') %>"><%= organization.phone %></a></li><% } %>
+      <% if (organization.whatsapp) { %><li><a href="https://wa.me/<%= organization.whatsapp.replace(/\D/g, '') %>" rel="noopener noreferrer">WhatsApp: <%= organization.whatsapp %></a></li><% } %>
+      <% if (organization.address || organization.city || organization.country) { %><li class="preserve-lines"><%= [organization.address,organization.city,organization.country].filter(Boolean).join(', ') %></li><% } %>
+      <% if (organization.map_url) { %><li><a href="<%= organization.map_url %>" rel="noopener noreferrer"><%= labels.map %> ↗</a></li><% } %>
+    </ul></section><% } %>
+    <% if (organization.socials.length) { %><section><h2><%= labels.social %></h2><ul class="social-links"><% for (const social of organization.socials) { %><li><a class="social-link" data-social-link href="<%= social.url %>" rel="noopener noreferrer"><%- include('social-icon', {key:social.key}) %><span><%= social.label %></span><span class="social-arrow" aria-hidden="true">↗</span></a></li><% } %></ul></section><% } %>
+  </div>
+  <a class="footer-donate button-secondary mt-6" href="<%= donateUrl %>"><%= t.donate %> ↗</a>
+  <% if (organization.copyright) { %><p class="footer-copyright"><%= organization.copyright %></p><% } %>
+</div></footer>
+</body></html>

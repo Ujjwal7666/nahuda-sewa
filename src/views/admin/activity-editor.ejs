@@ -1,0 +1,7 @@
+<% const formatTarget=field.formatTarget||'description_format'; const editorFormat=values[formatTarget]||'PLAIN'; %>
+<div class="activity-editor-field settings-field">
+  <label for="<%= field.key %>"><%= field.label %><%= field.optional?' (optional)':' *' %></label>
+  <p class="field-hint" id="<%= field.key %>-hint">Write a structured article using headings, paragraphs and lists. Existing links and inline images are preserved. Manage supporting photos using the image controls. Up to <%= new Intl.NumberFormat('en').format(field.max) %> characters per language.</p>
+  <noscript><p class="field-hint">JavaScript is disabled. This field edits <%= editorFormat==='HTML'?'sanitized HTML source':'plain text' %>; existing formatting is retained. Enable JavaScript for the visual toolbar.</p></noscript>
+  <textarea class="activity-editor-source" data-activity-editor data-format="<%= editorFormat %>" data-format-target="<%= formatTarget %>" data-heading-first="<%= formatTarget==='additional_format' && editorFormat==='PLAIN'?'true':'false' %>" data-max-bytes="<%= field.maxBytes||60000 %>" id="<%= field.key %>" name="<%= field.key %>" lang="<%= field.lang %>" maxlength="<%= field.max %>" rows="18" aria-describedby="<%= field.key %>-hint" <%= errors.some(error=>error.key===field.key)?'aria-invalid=true':'' %>><%= editorFormat==='HTML'?sanitizeActivityHtml(values[field.key]||''):values[field.key]||'' %></textarea>
+</div>

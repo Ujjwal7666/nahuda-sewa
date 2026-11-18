@@ -1,0 +1,15 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main" class="page-width organization-page" tabindex="-1">
+  <% if(key==='about') { %><%- include('about-content') %><% } else { %>
+  <header class="organization-heading"><p class="eyebrow"><%= t.about %></p><h1><%= heading %></h1></header>
+  <nav class="organization-links" aria-label="<%= t.about %>"><% for(const [item,label,path] of [['about',t.organization,'/about'],['team',t.team,'/about/team'],['committee',t.committee,'/about/committee']]) { %><a class="button-secondary" href="<%= localePrefix+path %>" <% if(item===key) { %>aria-current="page"<% } %>><%= label %></a><% } %></nav>
+  <% if(key==='committee') { %><%- include('committee-content') %><% } else if(rows.length) { %><div class="member-grid"><% for(const member of rows) { %><article class="organization-card member-card" data-member-card>
+    <div class="member-portrait"><div class="member-photo-fallback" aria-hidden="true"><svg viewBox="0 0 120 120" focusable="false"><circle cx="60" cy="40" r="20"/><path d="M20 108v-12a40 40 0 0 1 80 0v12z"/></svg></div><% if(member.photo) { %><img class="member-photo" src="<%= assetUrl(member.photo) %>" alt="<%= contentText(member,'name',locale) %>" width="<%= member.photo.width %>" height="<%= member.photo.height %>" loading="lazy" decoding="async"><% } %></div><div class="member-details">
+    <h2><%= contentText(member,'name',locale) %></h2><p class="member-position"><%= contentText(member,key==='team'?'designation':'position',locale) %></p>
+    <% if(key==='committee') { %><p class="member-role"><%= contentText(member,'committee_role',locale) %></p><% } %>
+    <% const introduction=contentText(member,'introduction',locale); if(introduction.trim()) { %><p class="preserve-lines member-introduction"><%= introduction %></p><% } %></div>
+  </article><% } %></div><% } else { %><p class="form-alert"><%= labels.empty %></p><% } %>
+  <% } %>
+</main>
+<%- include('../partials/footer') %>

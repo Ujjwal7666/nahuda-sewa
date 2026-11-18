@@ -1,0 +1,6 @@
+<dialog class="gallery-lightbox" aria-labelledby="lightbox-title" data-gallery-lightbox>
+<div class="gallery-lightbox-panel"><header class="gallery-lightbox-header"><h2 id="lightbox-title"><%= heading %></h2><button type="button" data-lightbox-close aria-label="<%= labels.close %>">×</button></header>
+<div class="gallery-lightbox-stage"><span class="gallery-lightbox-fallback" data-lightbox-fallback role="status" hidden><%= labels.unavailable %></span><img data-lightbox-image alt="" decoding="async"><button type="button" class="gallery-lightbox-prev" data-lightbox-prev aria-label="<%= labels.previous %>">←</button><button type="button" class="gallery-lightbox-next" data-lightbox-next aria-label="<%= labels.next %>">→</button></div>
+<div class="gallery-lightbox-info"><p data-lightbox-caption></p><p class="gallery-credit" data-lightbox-credit></p><p data-lightbox-counter role="status" aria-live="polite"></p></div>
+<div class="gallery-lightbox-thumbs" role="group" aria-label="<%= labels.thumbnails %>"><% for(const [index,image] of album.images.entries()) { %><button type="button" data-lightbox-thumb="<%= index %>" aria-label="<%= labels.open+' '+(index+1) %>"><img src="<%= assetUrl(image.image) %>" width="80" height="60" alt="" loading="lazy" decoding="async"></button><% } %></div>
+</div></dialog>

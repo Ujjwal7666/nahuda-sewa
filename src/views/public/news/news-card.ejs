@@ -1,0 +1,11 @@
+<article class="news-editorial-card <%= news.featured_image?'':'news-text-card' %>">
+  <a class="news-card-link" href="<%= localePrefix+'/news/'+news.slug %>" aria-labelledby="news-title-<%= news.id %>">
+    <% if(news.featured_image) { %><div class="news-card-media"><img src="<%= assetUrl(news.featured_image) %>" alt="" width="<%= news.featured_image.width %>" height="<%= news.featured_image.height %>" loading="lazy" decoding="async"></div><% } %>
+    <div class="news-card-copy">
+      <% if(news.published_date) { %><time class="news-published" datetime="<%= dateInput(news.published_date) %>"><%= formatDate(news.published_date) %></time><% } %>
+      <h2 id="news-title-<%= news.id %>"><%= contentText(news,'title',locale) %></h2>
+      <% if(contentText(news,'summary',locale).trim()) { %><p class="preserve-lines news-card-excerpt"><%= contentText(news,'summary',locale) %></p><% } %>
+      <span class="text-link news-card-read"><%= labels.read %><span aria-hidden="true">→</span></span>
+    </div>
+  </a>
+</article>

@@ -1,0 +1,2 @@
+<% const image=row.featured_image; const full=position==='FULL'; const photoWidth=Math.round(Math.min(full?1200:520,(full?800:400)*image.width/image.height)); const photoHeight=Math.round(photoWidth*image.height/image.width); %>
+<figure class="activity-cover"><a href="<%= assetUrl(image) %>" aria-label="<%= contentText(row,'name',locale) %>"><img src="<%= assetUrl(image) %>" alt="<%= contentText(row,'name',locale) %>" width="<%= photoWidth %>" height="<%= photoHeight %>" decoding="async"></a></figure>

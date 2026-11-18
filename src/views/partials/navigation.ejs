@@ -1,0 +1,21 @@
+<nav id="public-navigation" class="public-navigation" aria-label="<%= t.navigation %>">
+  <a class="nav-home" href="<%= homeUrl %>"<% if (isHome) { %> aria-current="page"<% } %>><%= t.home %></a>
+  <% for (const [group, children] of [['about', ['organization', 'team', 'committee']], ['media', ['news', 'gallery', 'testimonials']]]) { %>
+    <% if (group === 'media') { %>
+    <details class="nav-dropdown nav-services">
+      <summary<% if(contentPath==='/services' || contentPath.startsWith('/services/')) { %> aria-current="page"<% } %>><%= t.services %><span aria-hidden="true">⌄</span></summary>
+      <div class="dropdown-panel">
+        <a class="dropdown-item" href="<%= localePrefix %>/services"><%= t.services %></a>
+        <% for(const category of serviceCategories) { %><a class="dropdown-item" href="<%= localePrefix+'/services/category/'+category.slug %>"<% if(contentPath==='/services/category/'+category.slug) { %> aria-current="page"<% } %>><%= category['name_'+locale] %></a><% } %>
+      </div>
+    </details><a class="nav-programs" href="<%= localePrefix %>/programs" <%= contentPath==='/programs'||contentPath.startsWith('/programs/')?'aria-current=page':'' %>><%= t.programs %></a><% } %>
+    <details class="nav-dropdown">
+      <summary><%= t[group] %><span aria-hidden="true">⌄</span></summary>
+      <div class="dropdown-panel">
+        <% for (const child of children) { const path=group==='about'?{organization:'/about',team:'/about/team',committee:'/about/committee'}[child]:'/'+child; %><a class="dropdown-item" href="<%= localePrefix+path %>" <% if(contentPath===path) { %>aria-current="page"<% } %>><%= t[child] %></a><% } %>
+      </div>
+    </details>
+  <% } %>
+  <a class="nav-contact" href="<%= localePrefix %>/contact"<% if(contentPath==='/contact') { %> aria-current="page"<% } %>><%= t.contact %></a>
+  <a class="nav-donate" href="<%= donateUrl %>"<% if (isDonate) { %> aria-current="page"<% } %>><%= t.donate %></a>
+</nav>

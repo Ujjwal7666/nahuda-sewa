@@ -1,0 +1,20 @@
+<aside class="admin-sidebar">
+  <a href="/" class="identity mb-8"><img class="brand-logo" src="<%= branding.logoUrl %>" width="44" height="44" alt=""><strong>Nahuda Sewa</strong></a>
+  <nav aria-label="Admin navigation">
+    <a href="/admin/dashboard" class="<%= section === 'Dashboard' ? 'admin-current' : 'admin-nav-item' %>" <%= section === 'Dashboard' ? 'aria-current=page' : '' %>>Dashboard</a>
+    <% for (const [group, entries] of Object.entries({ Organization: ['Organization Details', 'Vision & Mission', 'Team', 'Committee', 'Life Members'], Content: ['Core Activities', 'Activity categories', 'Our Work', 'News & Updates', 'Gallery', 'Testimonials'], Messages: ['Contact / Feedback'] })) { %>
+      <details class="admin-nav-group" <%= section === group ? 'open' : '' %>>
+        <summary class="admin-nav-heading"><%= group %></summary>
+        <a class="admin-nav-item text-link" href="/admin/<%= group === 'Organization' ? 'organization/settings' : group.toLowerCase() %>"><%= group === 'Organization' ? 'Organization Settings' : 'Section overview' %></a>
+        <% if (group === 'Messages') { %><a class="admin-nav-item text-link" href="/admin/messages/donation-receipts">Donation Receipts</a><% } %>
+        <% for (const entry of entries) { const path={'Contact / Feedback':'/admin/messages/contact-feedback','Our Work':'/admin/programs','Core Activities':'/admin/services','Activity categories':'/admin/service-categories','Organization Details':'/admin/organization/about','Vision & Mission':'/admin/vision-mission','Team':'/admin/team','Committee':'/admin/committee','Life Members':'/admin/life-members','News & Updates':'/admin/news','Gallery':'/admin/gallery','Testimonials':'/admin/testimonials'}[entry]; if(path) { %><a class="admin-nav-item text-link" href="<%= path %>"><%= entry %></a><% } else { %><span class="admin-nav-item" aria-disabled="true"><%= entry %> <small>(Upcoming)</small></span><% } } %>
+      </details>
+    <% } %>
+    <h2 class="admin-nav-heading">Account</h2>
+    <a href="/admin/account/change-password" class="<%= section === 'Account' ? 'admin-current' : 'admin-nav-item' %>" <%= section === 'Account' ? 'aria-current=page' : '' %>>Change Password</a>
+    <form method="post" action="/admin/logout">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="admin-nav-item logout-button" type="submit">Logout</button>
+    </form>
+  </nav>
+</aside>

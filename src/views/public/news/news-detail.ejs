@@ -1,0 +1,8 @@
+<article class="news-editorial-detail">
+  <% if(row.published_date) { %><p class="news-article-meta"><span><%= labels.published %></span><time datetime="<%= dateInput(row.published_date) %>"><%= formatDate(row.published_date) %></time></p><% } %>
+  <% if(contentText(row,'summary',locale).trim()) { %><p class="news-article-lead preserve-lines"><%= contentText(row,'summary',locale) %></p><% } %>
+  <% if(row.featured_image) { const photoWidth=Math.round(Math.min(640,420*row.featured_image.width/row.featured_image.height)); const photoHeight=Math.round(photoWidth*row.featured_image.height/row.featured_image.width); %><figure class="news-article-cover"><a href="<%= assetUrl(row.featured_image) %>" aria-label="<%= contentText(row,'title',locale) %>"><img src="<%= assetUrl(row.featured_image) %>" alt="<%= contentText(row,'title',locale) %>" width="<%= photoWidth %>" height="<%= photoHeight %>" decoding="async"></a></figure><% } %>
+  <% if(contentText(row,'content',locale).trim()) { %><div class="preserve-lines news-article-body"><%= contentText(row,'content',locale) %></div><% } %>
+  <% if(row.images.length) { %><section class="news-article-gallery" aria-label="<%= labels.images %>"><h2><%= labels.images %></h2><div class="news-article-images"><% for(const image of row.images) { %><figure><a href="<%= assetUrl(image.media) %>"><img src="<%= assetUrl(image.media) %>" alt="<%= contentText(image,'alt_text',locale) %>" width="<%= image.media.width %>" height="<%= image.media.height %>" loading="lazy" decoding="async"></a></figure><% } %></div></section><% } %>
+  <footer class="news-article-footer"><a class="text-link" href="<%= localePrefix %>/news"><span aria-hidden="true">←</span> <%= labels.back %></a></footer>
+</article>

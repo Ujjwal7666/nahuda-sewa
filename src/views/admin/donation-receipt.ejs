@@ -1,0 +1,9 @@
+<%- include('partials/start') %>
+<a class="text-link" href="/admin/messages/donation-receipts">← Donation Receipts</a>
+<h1 class="text-3xl font-bold mt-3"><%= receipt.full_name %></h1>
+<% if(saved) { %><p class="form-alert" role="status">Receipt status updated.</p><% } %>
+<section class="donate-card mt-6"><h2>Submission details</h2><dl class="bank-details">
+<% for(const [label,value] of [['Email',receipt.email],['Phone',receipt.phone],['Donation date',receipt.donation_date.toISOString().slice(0,10)],['Amount',receipt.currency+' '+receipt.donation_amount.toFixed(2)],['Transaction / reference',receipt.transaction_reference],['Message',receipt.message],['Submitted (UTC)',receipt.created_at.toISOString().replace('T',' ').slice(0,19)],['Status',receipt.status]]) { if(value) { %><div><dt><%= label %></dt><dd class="preserve-lines"><%= value %></dd></div><% }} %></dl>
+<form method="post" action="/admin/messages/donation-receipts/<%= receipt.id %>/status" class="receipt-filter"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><label for="status">Review status</label><select id="status" name="status"><option value="NEW" <%= receipt.status==='NEW'?'selected':'' %>>New</option><option value="REVIEWED" <%= receipt.status==='REVIEWED'?'selected':'' %>>Reviewed</option></select><button class="button-primary">Save status</button></form><p class="text-muted">This status does not confirm or verify payment.</p></section>
+<section class="donate-card mt-6"><h2>Receipt image</h2><p><a class="text-link" href="/admin/messages/donation-receipts/<%= receipt.id %>/file?download=1">Download receipt ↓</a></p><a href="/admin/messages/donation-receipts/<%= receipt.id %>/file"><img class="private-receipt" src="/admin/messages/donation-receipts/<%= receipt.id %>/file" alt="Receipt submitted by <%= receipt.full_name %>"></a></section>
+<%- include('partials/end') %>

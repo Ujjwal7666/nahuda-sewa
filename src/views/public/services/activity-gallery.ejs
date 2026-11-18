@@ -1,0 +1,8 @@
+<% if(row.images.length) { %><section class="activity-content-section activity-supporting-images" id="service-gallery" aria-label="<%= labels.gallery %>">
+  <div class="activity-gallery <%= row.images.length===1?'activity-gallery-single':'' %>">
+    <% for(const image of row.images) { %><figure>
+      <a href="<%= assetUrl(image.image) %>"><img src="<%= assetUrl(image.image) %>" alt="<%= contentText(image,'alt_text',locale)||contentText(row,'name',locale) %>" width="<%= image.image.width %>" height="<%= image.image.height %>" loading="lazy" decoding="async"></a>
+      <% if(contentText(image,'caption',locale).trim()) { %><figcaption class="preserve-lines"><%= contentText(image,'caption',locale) %></figcaption><% } %>
+    </figure><% } %>
+  </div>
+</section><% } %>

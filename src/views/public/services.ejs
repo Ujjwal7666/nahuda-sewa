@@ -1,0 +1,19 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main" class="page-width organization-page services-page <%= row?'activity-detail-page':'activity-list-page' %>" tabindex="-1">
+<% if(!row) { %><header class="organization-heading"><p class="eyebrow"><%= t.services %></p><h1><%= heading %></h1><% if(!row) { const introduction=category?contentText(category,'description',locale):labels.homeIntro; if(introduction.trim()) { %><p class="activity-list-intro preserve-lines"><%= introduction %></p><% } } %></header><% } %>
+<%- include('services/section-navigation') %>
+<% if(!row) { %>
+<% if(category) { %>
+<% if(!rows.length) { %><p class="activity-list-empty"><%= labels.empty %></p><% } else { %><div class="activity-card-grid"><% for(const service of rows) { %><%- include('services/service-card',{service,cardHeadingLevel:2}) %><% } %></div><% } %>
+<% } else if(!groups.length) { %><p class="activity-list-empty"><%= labels.empty %></p>
+<% } else { %>
+<div class="service-groups"><% for(const group of groups) { %><section class="service-group" id="<%= group.anchor %>" aria-labelledby="<%= group.anchor %>-heading">
+<header class="service-section-heading"><div><p class="eyebrow"><%= labels.category %></p><h2 id="<%= group.anchor %>-heading" tabindex="-1"><%= group.category?contentText(group.category,'name',locale):labels.other %></h2>
+<% if(group.category && contentText(group.category,'description',locale)) { %><p class="preserve-lines text-muted"><%= contentText(group.category,'description',locale) %></p><% } %></div>
+<% if(group.category) { %><a class="text-link" href="<%= localePrefix+group.path %>"><%= labels.explore %> <span aria-hidden="true">→</span></a><% } %></header>
+<% if(group.services.length) { %><div class="activity-card-grid"><% for(const service of group.services) { %><%- include('services/service-card',{service,cardHeadingLevel:3}) %><% } %></div><% } else { %><p class="activity-list-empty"><%= labels.empty %></p><% } %></section><% } %></div>
+<% } %>
+<% } else { %><%- include('services/activity-detail') %><% } %>
+</main>
+<%- include('../partials/footer') %>

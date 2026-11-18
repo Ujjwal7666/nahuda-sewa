@@ -1,0 +1,548 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum ContactStatus {
+  NEW
+  READ
+}
+
+model ContactSubmission {
+  id             Int           @id @default(autoincrement())
+  name           String        @db.VarChar(100)
+  email          String        @db.VarChar(254)
+  phone          String?       @db.VarChar(64)
+  subject        String        @db.VarChar(200)
+  message        String        @db.Text
+  submission_key String        @unique @db.Char(64)
+  submitted_at   DateTime      @default(now()) @db.DateTime(3)
+  status         ContactStatus @default(NEW)
+
+  @@index([status, submitted_at, id])
+  @@index([submitted_at, id])
+  @@map("contact_submissions")
+}
+
+enum ReceiptStatus {
+  NEW
+  REVIEWED
+}
+
+model DonationReceiptSubmission {
+  id                    Int           @id @default(autoincrement())
+  full_name             String        @db.VarChar(100)
+  email                 String        @db.VarChar(254)
+  phone                 String?       @db.VarChar(64)
+  donation_date         DateTime      @db.Date
+  donation_amount       Decimal       @db.Decimal(11, 2)
+  currency              String        @db.Char(3)
+  transaction_reference String?       @db.VarChar(150)
+  message               String?       @db.Text
+  receipt_key           String        @unique @db.VarChar(80)
+  mime_type             String        @db.VarChar(32)
+  size_bytes            Int
+  width                 Int
+  height                Int
+  submission_key        String        @unique @db.Char(64)
+  status                ReceiptStatus @default(NEW)
+  created_at            DateTime      @default(now()) @db.DateTime(3)
+  updated_at            DateTime      @updatedAt @db.DateTime(3)
+
+  @@index([status, created_at, id])
+  @@index([created_at, id])
+  @@map("donation_receipt_submissions")
+}
+
+model AdminUser {
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(100)
+  email           String    @unique @db.VarChar(254)
+  password_hash   String    @db.VarChar(255)
+  is_active       Boolean   @default(true)
+  session_version Int       @default(1)
+  last_login_at   DateTime? @db.DateTime(3)
+  created_at      DateTime  @default(now()) @db.DateTime(3)
+  updated_at      DateTime  @updatedAt @db.DateTime(3)
+
+  @@map("admins")
+}
+
+model AdminSession {
+  id         String   @id @db.VarChar(128)
+  data       String   @db.Text
+  expires_at DateTime @db.DateTime(3)
+  revoked    Boolean  @default(false)
+
+  @@index([expires_at])
+  @@map("admin_sessions")
+}
+
+model AuthRateLimit {
+  id         String   @id @db.VarChar(100)
+  attempts   Int      @default(1)
+  expires_at DateTime @db.DateTime(3)
+
+  @@index([expires_at])
+  @@map("auth_rate_limits")
+}
+
+model OrganizationSettings {
+  id                       Int         @id @default(1)
+  revision                 Int         @default(1)
+  name_en                  String?     @db.VarChar(200)
+  name_ne                  String?     @db.VarChar(200)
+  short_name_en            String?     @db.VarChar(80)
+  short_name_ne            String?     @db.VarChar(80)
+  tagline_en               String?     @db.VarChar(250)
+  tagline_ne               String?     @db.VarChar(250)
+  primary_email            String?     @db.VarChar(254)
+  secondary_email          String?     @db.VarChar(254)
+  phone                    String?     @db.VarChar(64)
+  whatsapp                 String?     @db.VarChar(64)
+  address_en               String?     @db.VarChar(500)
+  address_ne               String?     @db.VarChar(500)
+  city_en                  String?     @db.VarChar(100)
+  city_ne                  String?     @db.VarChar(100)
+  country_en               String?     @db.VarChar(100)
+  country_ne               String?     @db.VarChar(100)
+  map_url                  String?     @db.Text
+  facebook_url             String?     @db.Text
+  instagram_url            String?     @db.Text
+  youtube_url              String?     @db.Text
+  linkedin_url             String?     @db.Text
+  x_url                    String?     @db.Text
+  footer_description_en    String?     @db.Text
+  footer_description_ne    String?     @db.Text
+  copyright_en             String?     @db.VarChar(250)
+  copyright_ne             String?     @db.VarChar(250)
+  donation_intro_en        String?     @db.Text
+  donation_intro_ne        String?     @db.Text
+  bank_name                String?     @db.VarChar(150)
+  account_name             String?     @db.VarChar(150)
+  account_number           String?     @db.VarChar(100)
+  branch                   String?     @db.VarChar(150)
+  swift_code               String?     @db.VarChar(11)
+  donation_instructions_en String?     @db.Text
+  donation_instructions_ne String?     @db.Text
+  site_title_en            String?     @db.VarChar(200)
+  site_title_ne            String?     @db.VarChar(200)
+  site_description_en      String?     @db.VarChar(500)
+  site_description_ne      String?     @db.VarChar(500)
+  primary_logo_id          Int?
+  primary_logo             MediaAsset? @relation("primary_logo", fields: [primary_logo_id], references: [id], onDelete: SetNull)
+  footer_logo_id           Int?
+  footer_logo              MediaAsset? @relation("footer_logo", fields: [footer_logo_id], references: [id], onDelete: SetNull)
+  favicon_id               Int?
+  favicon                  MediaAsset? @relation("favicon", fields: [favicon_id], references: [id], onDelete: SetNull)
+  donation_qr_id           Int?
+  donation_qr              MediaAsset? @relation("donation_qr", fields: [donation_qr_id], references: [id], onDelete: SetNull)
+  sharing_image_id         Int?
+  sharing_image            MediaAsset? @relation("sharing_image", fields: [sharing_image_id], references: [id], onDelete: SetNull)
+  created_at               DateTime    @default(now()) @db.DateTime(3)
+  updated_at               DateTime    @updatedAt @db.DateTime(3)
+
+  @@map("organization_settings")
+}
+
+model MediaAsset {
+  program_features Program[]
+  program_images ProgramImage[]
+  service_features Service[]
+  service_images ServiceImage[]
+  news_features News[]
+  news_images NewsImage[]
+  album_covers GalleryAlbum[]
+  gallery_images GalleryImage[]
+  testimonials Testimonial[]
+  about_heroes AboutOrganization[] @relation("about_hero")
+  team_members TeamMember[]
+  committee_members CommitteeMember[]
+  about_images AboutImage[]
+  id                     Int                    @id @default(autoincrement())
+  storage_key            String                 @unique @db.VarChar(80)
+  mime_type              String                 @db.VarChar(32)
+  size_bytes             Int
+  width                  Int
+  height                 Int
+  created_at             DateTime               @default(now()) @db.DateTime(3)
+  primary_logo_settings  OrganizationSettings[] @relation("primary_logo")
+  footer_logo_settings   OrganizationSettings[] @relation("footer_logo")
+  favicon_settings       OrganizationSettings[] @relation("favicon")
+  donation_qr_settings   OrganizationSettings[] @relation("donation_qr")
+  sharing_image_settings OrganizationSettings[] @relation("sharing_image")
+
+  @@map("media_assets")
+}
+
+model ServiceCategory {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  name_en String @db.VarChar(200)
+  name_ne String @db.VarChar(200)
+  slug String @unique @db.VarChar(120)
+  description_en String @db.Text
+  description_ne String @db.Text
+  display_order Int @default(0)
+  is_active Boolean @default(false)
+  services Service[]
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@index([is_active, display_order, id])
+  @@map("service_categories")
+}
+
+model Service {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  name_en String @db.VarChar(200)
+  name_ne String @db.VarChar(200)
+  slug String @unique @db.VarChar(120)
+  short_description_en String @db.Text
+  short_description_ne String @db.Text
+  full_description_en String @db.LongText
+  full_description_ne String @db.LongText
+  description_format String @default("PLAIN") @db.VarChar(10)
+  image_position String @default("DEFAULT") @db.VarChar(10)
+  who_is_it_for_en String @db.Text
+  who_is_it_for_ne String @db.Text
+  availability_en String @db.Text
+  availability_ne String @db.Text
+  location_en String @db.Text
+  location_ne String @db.Text
+  icon String? @db.VarChar(40)
+  featured_image_id Int?
+  featured_image MediaAsset? @relation(fields: [featured_image_id], references: [id], onDelete: Restrict)
+  category_id Int?
+  category ServiceCategory? @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  display_order Int @default(0)
+  is_active Boolean @default(false)
+  is_featured Boolean @default(false)
+  features ServiceFeature[]
+  images ServiceImage[]
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@index([is_active, display_order, id])
+  @@index([is_active, is_featured, display_order, id])
+  @@map("services")
+}
+
+model ServiceFeature {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  title_en String @db.VarChar(200)
+  title_ne String @db.VarChar(200)
+  description_en String @db.Text
+  description_ne String @db.Text
+  display_order Int @default(0)
+  service_id Int
+  service Service @relation(fields: [service_id], references: [id], onDelete: Restrict)
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@index([service_id, display_order, id])
+  @@map("service_features")
+}
+
+model ServiceImage {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  caption_en String @db.Text
+  caption_ne String @db.Text
+  alt_text_en String @db.VarChar(500)
+  alt_text_ne String @db.VarChar(500)
+  display_order Int @default(0)
+  image_id Int
+  image MediaAsset @relation(fields: [image_id], references: [id], onDelete: Restrict)
+  service_id Int
+  service Service @relation(fields: [service_id], references: [id], onDelete: Restrict)
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@index([service_id, display_order, id])
+  @@map("service_images")
+}
+
+model AboutOrganization {
+  id Int @id @default(1)
+  revision Int @default(1)
+  heading_en String @db.VarChar(200)
+  heading_ne String @db.VarChar(200)
+  introduction_en String @db.Text
+  introduction_ne String @db.Text
+  background_history_en String @db.Text
+  background_history_ne String @db.Text
+  objectives_en String @db.Text
+  objectives_ne String @db.Text
+  core_values_en String @db.Text
+  core_values_ne String @db.Text
+  images AboutImage[]
+  hero_image_id Int?
+  hero_image MediaAsset? @relation("about_hero", fields: [hero_image_id], references: [id], onDelete: Restrict)
+  youtube_url String? @db.VarChar(100)
+  statistics AboutStatistic[]
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@map("about_organization")
+}
+
+model VisionMission {
+  id Int @id @default(1)
+  revision Int @default(1)
+  vision_en String @db.Text
+  vision_ne String @db.Text
+  mission_en String @db.Text
+  mission_ne String @db.Text
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@map("vision_mission")
+}
+
+model TeamMember {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  name_en String @db.VarChar(200)
+  name_ne String @db.VarChar(200)
+  designation_en String @db.VarChar(200)
+  designation_ne String @db.VarChar(200)
+  introduction_en String @db.Text
+  introduction_ne String @db.Text
+  photo_id Int?
+  photo MediaAsset? @relation(fields: [photo_id], references: [id], onDelete: Restrict)
+  display_order Int @default(0)
+  is_active Boolean @default(false)
+  @@index([is_active, display_order, id])
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@map("team_members")
+}
+
+model CommitteeMember {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  name_en String @db.VarChar(200)
+  name_ne String @db.VarChar(200)
+  position_en String @db.VarChar(200)
+  position_ne String @db.VarChar(200)
+  committee_role_en String @db.VarChar(200)
+  committee_role_ne String @db.VarChar(200)
+  introduction_en String @db.Text
+  introduction_ne String @db.Text
+  photo_id Int?
+  branch_id Int?
+  branch CommitteeBranch? @relation(fields: [branch_id], references: [id], onDelete: Restrict)
+  photo MediaAsset? @relation(fields: [photo_id], references: [id], onDelete: Restrict)
+  display_order Int @default(0)
+  is_active Boolean @default(false)
+  @@index([is_active, display_order, id])
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@map("committee_members")
+  @@index([branch_id, is_active, display_order, id])
+}
+
+model CommitteeBranch {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  name_en String @db.VarChar(200)
+  name_ne String @db.VarChar(200)
+  description_en String @db.Text
+  description_ne String @db.Text
+  display_order Int @default(0)
+  is_active Boolean @default(false)
+  members CommitteeMember[]
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@index([is_active, display_order, id])
+  @@map("committee_branches")
+}
+
+model LifeMember {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  name_en String @db.VarChar(200)
+  name_ne String @db.VarChar(200)
+  display_order Int @default(0)
+  is_active Boolean @default(false)
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@index([is_active, display_order, id])
+  @@map("life_members")
+}
+
+model AboutImage {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  alt_text_en String @db.VarChar(500)
+  alt_text_ne String @db.VarChar(500)
+  media_id Int
+  media MediaAsset @relation(fields: [media_id], references: [id], onDelete: Restrict)
+  display_order Int @default(0)
+  about_id Int @default(1)
+  about AboutOrganization @relation(fields: [about_id], references: [id], onDelete: Restrict)
+  @@index([about_id, display_order, id])
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@map("about_images")
+}
+
+model AboutStatistic {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  kind String @unique @db.VarChar(32)
+  label_en String @db.VarChar(100)
+  label_ne String @db.VarChar(100)
+  value String @db.VarChar(40)
+  display_order Int @default(0)
+  is_active Boolean @default(false)
+  about_id Int @default(1)
+  about AboutOrganization @relation(fields: [about_id], references: [id], onDelete: Restrict)
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@index([about_id, is_active, display_order, id])
+  @@map("about_statistics")
+}
+
+enum NewsStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model News {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  title_en String @db.VarChar(200)
+  title_ne String @db.VarChar(200)
+  summary_en String @db.Text
+  summary_ne String @db.Text
+  content_en String @db.Text
+  content_ne String @db.Text
+  featured_image_id Int?
+  featured_image MediaAsset? @relation(fields: [featured_image_id], references: [id], onDelete: Restrict)
+  slug String @unique @db.VarChar(120)
+  slug_locked Boolean @default(false)
+  published_date DateTime? @db.Date
+  status NewsStatus @default(DRAFT)
+  images NewsImage[]
+  @@index([status, published_date, id])
+  @@map("news")
+}
+
+model GalleryAlbum {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  title_en String @db.VarChar(200)
+  title_ne String @db.VarChar(200)
+  description_en String @db.Text
+  description_ne String @db.Text
+  cover_image_id Int?
+  cover_image MediaAsset? @relation(fields: [cover_image_id], references: [id], onDelete: Restrict)
+  date DateTime? @db.Date
+  is_active Boolean @default(false)
+  images GalleryImage[]
+  @@index([is_active, date, id])
+  @@map("gallery_albums")
+}
+
+model Testimonial {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  name_en String @db.VarChar(200)
+  name_ne String @db.VarChar(200)
+  position_organization_en String @db.VarChar(200)
+  position_organization_ne String @db.VarChar(200)
+  testimonial_en String @db.Text
+  testimonial_ne String @db.Text
+  photo_id Int?
+  photo MediaAsset? @relation(fields: [photo_id], references: [id], onDelete: Restrict)
+  display_order Int @default(0)
+  is_active Boolean @default(false)
+  @@index([is_active, display_order, id])
+  @@map("testimonials")
+}
+
+model NewsImage {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  alt_text_en String @db.VarChar(500)
+  alt_text_ne String @db.VarChar(500)
+  media_id Int
+  media MediaAsset @relation(fields: [media_id], references: [id], onDelete: Restrict)
+  news_id Int
+  news News @relation(fields: [news_id], references: [id], onDelete: Restrict)
+  display_order Int @default(0)
+  @@index([news_id, display_order, id])
+  @@map("news_images")
+}
+
+model GalleryImage {
+  credit_en String? @db.VarChar(200)
+  credit_ne String? @db.VarChar(200)
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  caption_en String @db.Text
+  caption_ne String @db.Text
+  alt_text_en String @db.VarChar(500)
+  alt_text_ne String @db.VarChar(500)
+  image_id Int
+  image MediaAsset @relation(fields: [image_id], references: [id], onDelete: Restrict)
+  album_id Int
+  album GalleryAlbum @relation(fields: [album_id], references: [id], onDelete: Restrict)
+  display_order Int @default(0)
+  @@index([album_id, display_order, id])
+  @@map("gallery_images")
+}
+
+model Program {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  title_en String @db.VarChar(200)
+  title_ne String @db.VarChar(200)
+  slug String @unique @db.VarChar(120)
+  full_description_en String @db.LongText
+  full_description_ne String @db.LongText
+  description_format String @default("HTML") @db.VarChar(10)
+  additional_format String @default("PLAIN") @db.VarChar(10)
+  images ProgramImage[]
+  additional_heading_en String @db.VarChar(200)
+  additional_heading_ne String @db.VarChar(200)
+  additional_content_en String @db.Text
+  additional_content_ne String @db.Text
+  featured_image_id Int?
+  featured_image MediaAsset? @relation(fields: [featured_image_id], references: [id], onDelete: Restrict)
+  display_order Int @default(0)
+  is_active Boolean @default(false)
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@index([is_active,display_order,id])
+  @@map("programs")
+}
+
+model ProgramImage {
+  id Int @id @default(autoincrement())
+  revision Int @default(1)
+  caption_en String @db.Text
+  caption_ne String @db.Text
+  alt_text_en String @db.VarChar(500)
+  alt_text_ne String @db.VarChar(500)
+  display_order Int @default(0)
+  image_id Int
+  image MediaAsset @relation(fields: [image_id], references: [id], onDelete: Restrict)
+  program_id Int
+  program Program @relation(fields: [program_id], references: [id], onDelete: Restrict)
+  created_at DateTime @default(now()) @db.DateTime(3)
+  updated_at DateTime @updatedAt @db.DateTime(3)
+  @@index([program_id, display_order, id])
+  @@map("program_images")
+}

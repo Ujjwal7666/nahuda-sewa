@@ -1,0 +1,9 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main" tabindex="-1" class="page-width error-content">
+  <p class="eyebrow text-link"><%= status %></p>
+  <h1 class="text-3xl sm:text-5xl font-semibold mt-5"><%= heading %></h1>
+  <p class="text-muted mt-5"><%= description %></p>
+  <a class="button-primary mt-8" href="<%= homeUrl %>"><%= t.back %></a>
+</main>
+<%- include('../partials/footer') %>

@@ -1,0 +1,8 @@
+<div class="gallery-admin-grid"><% for(const image of galleryImages) { %><article class="gallery-admin-card">
+  <img class="gallery-admin-preview" src="<%= assetUrl(image.image) %>" width="<%= image.image.width %>" height="<%= image.image.height %>" alt="<%= image.alt_text_en %>" loading="lazy">
+  <div class="gallery-admin-details"><p><strong><%= image.alt_text_en %></strong><br><span lang="ne"><%= image.alt_text_ne %></span></p>
+  <% if(image.caption_en||image.caption_ne) { %><p class="text-muted preserve-lines"><%= image.caption_en %><%= image.caption_en&&image.caption_ne?' / ':'' %><span lang="ne"><%= image.caption_ne %></span></p><% } %>
+  <% if(image.credit_en||image.credit_ne) { %><p class="text-muted"><%= image.credit_en %><%= image.credit_en&&image.credit_ne?' / ':'' %><span lang="ne"><%= image.credit_ne %></span></p><% } %>
+  <form class="gallery-order-form" method="post" action="<%= imagePath %>/<%= image.id %>/order"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="revision" value="<%= image.revision %>"><label for="image-order-<%= image.id %>">Order</label><input id="image-order-<%= image.id %>" name="display_order" type="number" min="0" max="999999" step="1" required value="<%= image.display_order %>"><button class="button-secondary" type="submit">Update order</button></form>
+  <div class="content-actions"><a class="text-link" href="<%= imagePath %>/<%= image.id %>/edit">Edit / Replace</a><a class="text-link" href="<%= imagePath %>/<%= image.id %>/delete">Remove image</a></div></div>
+</article><% } %></div>

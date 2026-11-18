@@ -1,0 +1,31 @@
+<%- include('partials/start') %>
+<h1 class="text-3xl font-bold mt-2">Organization Settings</h1>
+<p class="text-muted mt-3">One shared source for both languages. All fields are optional. Missing translations fall back to the other language.</p>
+<% if (saved) { %><p role="status" class="form-alert">Organization settings saved.</p><% } %>
+<% if (errors.length) { %><div role="alert" class="form-alert"><strong>Settings were not saved.</strong><ul><% for (const error of errors) { %><li><%= error %></li><% } %></ul><p>Selected uploads must be chosen again. If another tab saved changes, reload before trying again.</p></div><% } %>
+<nav class="settings-jump" aria-label="Settings sections"><a href="#branding">Branding</a><% for (const group of settingsSections) { %><a href="#<%= group.id %>"><%= group.title %></a><% } %></nav>
+<form class="settings-form" method="post" action="/admin/organization/settings" enctype="multipart/form-data">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <input type="hidden" name="revision" value="<%= revision %>">
+  <section id="branding" class="settings-section">
+    <h2>Branding &amp; Images</h2><p class="text-muted">Shared across English and नेपाली. PNG, JPEG or WebP; 10 MB and 16 megapixels maximum per image. Images are safely converted to PNG. Use a square PNG for the favicon. Footer uses the primary logo when no footer logo is set.</p>
+    <div class="settings-grid">
+      <% for (const slot of assetSlots) { %><div class="settings-asset">
+        <label for="<%= slot.key %>"><%= slot.label %></label>
+        <% if (row[slot.key]) { %><a href="<%= assetUrl(row[slot.key]) %>"><img src="<%= assetUrl(row[slot.key]) %>" alt="Current <%= slot.label %>" width="120" height="120"></a><label class="settings-check"><input type="checkbox" name="clear_<%= slot.key %>" value="1"> Remove current image</label><% } else { %><p class="text-muted">No image uploaded.</p><% } %>
+        <input id="<%= slot.key %>" type="file" name="<%= slot.key %>" accept="image/png,image/jpeg,image/webp">
+      </div><% } %>
+    </div>
+  </section>
+  <% for (const group of settingsSections) { %>
+  <section id="<%= group.id %>" class="settings-section"><h2><%= group.title %></h2>
+    <% if (group.id === 'donation') { %><p class="text-muted">Public bank/QR information only. Do not enter banking passwords or private credentials. No payments are processed.</p><% } %>
+    <div class="settings-grid">
+    <% for (const field of group.fields) { %><div class="settings-field"<% if (field.lang) { %> data-language="<%= field.lang %>"<% } %>>
+      <label for="<%= field.key %>"><%= field.label %></label>
+      <% if (field.type === 'textarea') { %><textarea id="<%= field.key %>" name="<%= field.key %>" maxlength="<%= field.max %>" rows="4" lang="<%= field.lang || 'en' %>"><%= values[field.key] || '' %></textarea><% } else { %><input id="<%= field.key %>" name="<%= field.key %>" type="<%= field.type %>" maxlength="<%= field.max %>" value="<%= values[field.key] || '' %>" lang="<%= field.lang || 'en' %>"><% } %>
+    </div><% } %></div>
+  </section><% } %>
+  <div class="settings-save"><button class="button-primary" type="submit">Save organization settings</button><a class="text-link" href="/" target="_blank" rel="noopener">View public website ↗</a></div>
+</form>
+<%- include('partials/end') %>

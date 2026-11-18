@@ -1,0 +1,23 @@
+<% const description=contentText(row,'full_description',locale); const hasDescription=hasActivityDescription(description,row.description_format); const details=['who_is_it_for','availability','location'].filter(key=>contentText(row,key,locale).trim()); const related=typeof relatedActivities==='undefined'?[]:relatedActivities; const position=['LEFT','RIGHT','TOP','FULL'].includes(row.image_position)?row.image_position:'DEFAULT'; const hasBody=Boolean(hasDescription||row.features.length||row.images.length||(row.featured_image && position!=='DEFAULT')||row.icon); const hasAside=Boolean(details.length||related.length||contactUrl); %>
+<article class="service-detail activity-detail activity-image-<%= position.toLowerCase() %>">
+  <%- include('activity-hero') %>
+
+  <% if(hasBody||hasAside) { %><div class="activity-content-layout <%= hasBody&&hasAside?'activity-content-with-aside':'' %>">
+    <% if(hasBody) { %><div class="activity-main-content">
+      <% if(row.icon) { %><span class="service-icon" aria-hidden="true"><%= row.icon %></span><% } %>
+      <% if(hasDescription || (row.featured_image && position!=='DEFAULT')) { %><div class="activity-article-flow">
+      <% if(row.featured_image && position!=='DEFAULT') { %><%- include('activity-cover',{position}) %><% } %>
+      <% if(hasDescription) { %><section class="activity-content-section"><h2><%= labels.about %></h2><div class="activity-prose"><%- activityDescription(description,row.description_format) %></div></section><% } %>
+      </div><% } %>
+      <%- include('activity-gallery') %>
+      <% if(row.features.length) { %><section class="activity-content-section" id="service-features"><h2><%= labels.features %></h2><div class="activity-feature-list"><% for(const [index,feature] of row.features.entries()) { %><div class="activity-feature"><span class="activity-feature-number" aria-hidden="true"><%= new Intl.NumberFormat(locale).format(index+1) %></span><div><h3><%= contentText(feature,'title',locale) %></h3><% if(contentText(feature,'description',locale).trim()) { %><p class="preserve-lines"><%= contentText(feature,'description',locale) %></p><% } %></div></div><% } %></div></section><% } %>
+    </div><% } %>
+    <% if(hasAside) { %><aside class="activity-information" aria-label="<%= labels.overview %>">
+      <% for(const key of details) { %><section class="activity-info-card" id="service-<%= key %>"><h2><%= labels[key] %></h2><p class="preserve-lines"><%= contentText(row,key,locale) %></p></section><% } %>
+      <% if(related.length) { %><section class="activity-info-card activity-related" aria-labelledby="activity-related-heading"><h2 id="activity-related-heading"><%= labels.related %></h2><ul><% for(const activity of related) { %><li><a href="<%= localePrefix+'/services/'+activity.slug %>"><% if(activity.featured_image) { %><img src="<%= assetUrl(activity.featured_image) %>" alt="" width="64" height="64" loading="lazy" decoding="async"><% } %><span><%= contentText(activity,'name',locale) %></span><span aria-hidden="true">→</span></a></li><% } %></ul></section><% } %>
+      <% if(contactUrl) { %><section class="activity-info-card service-contact"><h2><%= labels.contact %></h2><p><%= labels.contactBody %></p><p class="text-muted"><%= organization.name %></p><a class="button-primary" href="<%= contactUrl %>"><%= labels.contactLink %> <span aria-hidden="true">↗</span></a></section><% } %>
+    </aside><% } %>
+  </div><% } %>
+
+  <div class="activity-detail-footer"><a class="text-link" href="<%= localePrefix %>/services"><span aria-hidden="true">←</span> <%= labels.back %></a><% if(row.category?.is_active) { %><a class="text-link" href="<%= localePrefix+'/services/category/'+row.category.slug %>"><%= contentText(row.category,'name',locale) %> <span aria-hidden="true">→</span></a><% } %></div>
+</article>

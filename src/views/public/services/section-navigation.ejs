@@ -1,0 +1,12 @@
+<nav class="activity-section-nav" aria-label="<%= labels.browse %>">
+  <p class="eyebrow"><%= labels.browse %></p>
+  <div class="activity-nav-links">
+    <a class="button-secondary" href="<%= localePrefix %>/services" <%= !row&&!category?'aria-current=page':'' %>><%= labels.back %></a>
+    <% if(!row&&!category) { for(const group of groups) { %><a class="button-secondary" href="#<%= group.anchor %>-heading"><%= group.category?contentText(group.category,'name',locale):labels.other %></a><% } } else { for(const item of serviceCategories) { %><a class="button-secondary" href="<%= localePrefix+'/services/category/'+item.slug %>" <%= navigationCategory?.id===item.id?'aria-current=page':'' %>><%= contentText(item,'name',locale) %></a><% } } %>
+  </div>
+</nav>
+<% if(!row && navigationCategory?.services.length) { %>
+<nav class="activity-section-nav activity-child-nav" aria-label="<%= contentText(navigationCategory,'name',locale) %>">
+  <p class="eyebrow"><%= contentText(navigationCategory,'name',locale) %></p>
+  <div class="activity-nav-links"><% for(const activity of navigationCategory.services) { %><a class="button-secondary" href="<%= localePrefix+'/services/'+activity.slug %>" <%= row?.id===activity.id?'aria-current=page':'' %>><%= contentText(activity,'name',locale) %></a><% } %></div>
+</nav><% } %>

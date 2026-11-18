@@ -1,0 +1,6 @@
+<h2 class="settings-group-heading">Additional information</h2>
+<input type="hidden" id="additional_format" name="additional_format" value="<%= values.additional_format||'PLAIN' %>">
+<% for(const lang of ['en','ne']) {
+  const field={key:'additional_combined_'+lang,label:'Additional information '+lang.toUpperCase(),lang,optional:true,max:20000,maxBytes:60000,formatTarget:'additional_format'};
+  const combined=values.additional_format==='HTML'?(values['additional_content_'+lang]||''):(values['additional_heading_'+lang]||'')+((values['additional_heading_'+lang]||values['additional_content_'+lang])?'\n':'')+(values['additional_content_'+lang]||'');
+%><div class="settings-field activity-editor-row"><%- include('activity-editor',{field,values:{...values,[field.key]:combined}}) %></div><% } %>

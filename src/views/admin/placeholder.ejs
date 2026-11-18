@@ -1,0 +1,22 @@
+<%- include('partials/start') %>
+<h1 class="text-3xl font-bold mt-3"><%= section %></h1>
+<div class="admin-notice mt-8">
+  <% if (section === 'Messages') { %>
+  <h2 class="text-xl font-semibold">Donation Receipts</h2>
+  <p class="text-muted mt-3">View donor submissions and mark receipts as reviewed.</p>
+  <a class="button-secondary mt-6" href="/admin/messages/donation-receipts">Open Donation Receipts</a>
+  <h2 class="text-xl font-semibold mt-8">Contact / Feedback</h2><p class="text-muted mt-3">View visitor messages and mark them as read.</p>
+  <a class="button-secondary mt-6" href="/admin/messages/contact-feedback">Open Contact / Feedback</a>
+  <% } else if(section==='Content') { %>
+  <h2 class="text-xl font-semibold">Content CMS</h2><a class="button-secondary mt-6" href="/admin/services">Core Activities</a><a class="button-secondary mt-6" href="/admin/service-categories">Activity categories</a>
+  <p class="text-muted mt-3">Manage bilingual Our Work content, news, gallery albums and testimonials.</p>
+  <a class="button-secondary mt-6" href="/admin/programs">Our Work</a>
+  <a class="button-secondary mt-6" href="/admin/news">News &amp; Updates</a>
+  <a class="button-secondary mt-6" href="/admin/gallery">Gallery</a>
+  <a class="button-secondary mt-6" href="/admin/testimonials">Testimonials</a>
+  <% } else { %>
+  <h2 class="text-xl font-semibold">Available in a future phase</h2>
+  <p class="text-muted mt-3">This section has no content-management actions yet. Your account and password controls are available under Account.</p>
+  <% } %>
+</div>
+<%- include('partials/end') %>

@@ -1,0 +1,20 @@
+<% const data=typeof hero==='object' && hero?hero:{}; const activeCategory=row.category?.is_active?row.category:null; const categoryName=typeof data.category==='string'?data.category:(activeCategory?contentText(activeCategory,'name',locale):labels.heading); const activityTitle=typeof data.title==='string'?data.title:contentText(row,'name',locale); const summary=typeof data.summary==='string'?data.summary.trim():(typeof heroSubtitle==='string'?heroSubtitle.trim():''); const stats=Array.isArray(data.stats)?data.stats.filter(stat=>stat && typeof stat.label==='string' && stat.label.trim() && ['string','number'].includes(typeof stat.value) && String(stat.value).trim()).slice(0,3):[]; const imageUrl=typeof data.imageUrl==='string'?data.imageUrl.trim():assetUrl(row.featured_image); const showImage=data.showHeroImage!==false && (typeof showHeroImage==='undefined' || showHeroImage!==false); const initial=[...new Intl.Segmenter(locale,{granularity:'grapheme'}).segment(categoryName.trim())][0]?.segment||''; const ghost=row.icon && [...row.icon].length<=4?row.icon:initial; %>
+<header class="activity-hero activity-hero-navy">
+  <div class="activity-hero-glow" aria-hidden="true"></div>
+  <span class="activity-hero-ghost" aria-hidden="true"><%= ghost %></span>
+  <% if(imageUrl && showImage) { %><figure class="activity-hero-photo" data-activity-hero-photo hidden aria-hidden="true"><img data-src="<%= imageUrl %>" alt="" width="420" height="280" decoding="async"></figure><% } %>
+  <div class="activity-hero-copy">
+    <p class="eyebrow activity-hero-chip"><span aria-hidden="true"></span><%= categoryName %></p>
+    <span class="activity-hero-accent" aria-hidden="true"></span>
+    <h1><%= activityTitle %></h1>
+    <% if(summary) { %><p class="activity-hero-summary"><%= summary %></p><% } %>
+    <% if(stats.length) { %><ul class="activity-hero-stats"><% for(const stat of stats) { %><li><strong><%= stat.value %></strong><span><%= stat.label %></span></li><% } %></ul><% } %>
+    <nav class="activity-breadcrumb" aria-label="<%= labels.breadcrumb %>"><ol>
+      <li><a href="<%= localePrefix||'/' %>"><%= typeof t!=='undefined'?t.home:(locale==='ne'?'गृहपृष्ठ':'Home') %></a></li>
+      <li><span aria-hidden="true">/</span><a href="<%= localePrefix %>/services"><%= labels.heading %></a></li>
+      <% if(activeCategory) { %><li><span aria-hidden="true">/</span><a href="<%= localePrefix+'/services/category/'+activeCategory.slug %>"><%= categoryName %></a></li><% } %>
+      <li><span aria-hidden="true">/</span><span aria-current="page"><%= activityTitle %></span></li>
+    </ol></nav>
+  </div>
+</header>
+<script src="/assets/js/activity-hero.js" defer></script>

@@ -1,0 +1,41 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main" class="page-width donate-page" tabindex="-1">
+  <a class="text-link" href="<%= homeUrl %>">← <%= d.back %></a>
+  <header class="donate-heading"><p class="eyebrow"><%= d.eyebrow %></p><h1><%= d.title %></h1>
+    <% if (organization.donation_intro) { %><p class="preserve-lines donation-intro"><%= organization.donation_intro %></p><% } %>
+  </header>
+  <ol class="donate-steps"><% for (const [index,label] of [d.step1,d.step2,d.step3].entries()) { %><li><span aria-hidden="true"><%= index+1 %></span><%= label %></li><% } %></ol>
+  <% const bankKeys=['bank_name','account_name','account_number','branch','swift_code'].filter(key=>organization[key]); %>
+  <div class="donate-methods">
+    <% if (organization.donation_qr) { %><section class="donate-card qr-card"><h2><%= d.qr %></h2><p class="text-muted"><%= d.scan %></p><img class="donation-qr" src="<%= organization.donation_qr %>" alt="<%= d.qr %>" width="280" height="280"></section><% } %>
+    <% if (bankKeys.length) { %><section class="donate-card"><p class="eyebrow"><%= d.details %></p><h2><%= d.bank %></h2><dl class="bank-details"><% for (const key of bankKeys) { %><div><dt><%= d[key] %></dt><dd><span id="bank-<%= key %>"><%= organization[key] %></span><% if (['account_name','account_number'].includes(key)) { %><button type="button" class="copy-button" data-copy-target="bank-<%= key %>" data-copied="<%= d.copied %>" data-copy-failed="<%= d.copyFailed %>" aria-label="<%= d.copy %>: <%= d[key] %>" hidden><%= d.copy %></button><% } %></dd></div><% } %></dl><p class="copy-status text-muted" role="status" data-copy-status></p></section><% } %>
+  </div>
+  <% if (!organization.donation_qr && !bankKeys.length) { %><p class="form-alert"><%= d.empty %></p><% } %>
+  <% if (organization.donation_instructions) { %><section class="donation-instructions"><h2><%= d.instructions %></h2><p class="preserve-lines"><%= organization.donation_instructions %></p></section><% } %>
+  <section id="receipt" class="donate-card receipt-section">
+    <div class="receipt-introduction"><p class="eyebrow">03</p><h2><%= d.receipt %></h2><p><%= d.explanation %></p><p class="text-muted receipt-privacy"><%= d.privacy %></p>
+      <% if (organization.primary_email || organization.phone) { %><div class="receipt-help"><h3><%= d.support %></h3><% if (organization.primary_email) { %><a class="text-link" href="mailto:<%= organization.primary_email %>"><%= organization.primary_email %></a><% } %><% if (organization.phone) { %><a class="text-link" href="tel:<%= organization.phone.replace(/[^+\d]/g,'') %>"><%= organization.phone %></a><% } %></div><% } %>
+    </div>
+    <div>
+    <% if (success) { %><p class="form-alert" role="status"><%= d.success %></p><% } %>
+    <% if (message || errors.length) { %><div class="form-alert" role="alert"><p><%= message || d.errors %></p><% if (errors.length) { %><ul><% for (const key of errors) { %><li><a href="#<%= key %>"><%= d[key] %>: <%= key==='file'?d.fileError:d.invalid %></a></li><% } %></ul><% } %></div><% } %>
+    <% if (ready) { %>
+    <form method="post" action="<%= donateUrl %>#receipt" enctype="multipart/form-data" class="receipt-form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="_submission" value="<%= submissionToken %>">
+      <div class="receipt-trap" aria-hidden="true"><label for="website">Leave empty</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+      <div class="receipt-fields">
+      <% for (const [key,type,max,required,autocomplete] of [['full_name','text',100,true,'name'],['email','email',254,true,'email'],['phone','tel',64,false,'tel'],['donation_date','date',10,true,'off'],['donation_amount','number',12,true,'off']]) { %>
+        <div class="settings-field"><label for="<%= key %>"><%= d[key] %><%= required?' *':'' %></label><input id="<%= key %>" name="<%= key %>" type="<%= type %>" value="<%= values[key]||'' %>" maxlength="<%= max %>" autocomplete="<%= autocomplete %>"<% if(required) { %> required<% } %><% if(key==='donation_amount') { %> min="0.01" max="999999999.99" step="0.01" inputmode="decimal"<% } %><% if(key==='donation_date') { %> min="1900-01-01" max="<%= today %>"<% } %><% if(errors.includes(key)) { %> aria-invalid="true"<% } %>></div>
+      <% } %>
+      <div class="settings-field"><label for="currency"><%= d.currency %> *</label><select id="currency" name="currency" required aria-describedby="currency-hint"><% for (const currency of currencies) { %><option value="<%= currency %>" <%= values.currency===currency?'selected':'' %>><%= currency %></option><% } %></select><p id="currency-hint" class="field-hint"><%= d.currencyHint %></p></div>
+      <div class="settings-field receipt-wide"><label for="transaction_reference"><%= d.transaction_reference %></label><input id="transaction_reference" name="transaction_reference" maxlength="150" value="<%= values.transaction_reference||'' %>"></div>
+      <div class="settings-field receipt-wide"><label for="file"><%= d.file %> *</label><input id="file" type="file" name="receipt" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" required aria-describedby="upload-hint"><p id="upload-hint" class="field-hint"><%= d.upload %></p></div>
+      <div class="settings-field receipt-wide"><label for="message"><%= d.message %></label><textarea id="message" name="message" rows="3" maxlength="2000"><%= values.message||'' %></textarea></div>
+      </div><button type="submit" class="button-primary"><%= d.submit %> ↗</button>
+    </form>
+    <% } else { %><p class="form-alert"><%= d.unavailable %></p><% } %>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>

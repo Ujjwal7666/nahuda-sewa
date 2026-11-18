@@ -1,0 +1,38 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main id="main" class="page-width contact-page" tabindex="-1">
+  <header class="contact-heading"><h1><%= c.title %></h1><p class="text-muted"><%= c.intro %></p></header>
+  <div class="contact-layout">
+    <section class="contact-card contact-information" aria-labelledby="contact-details-heading">
+      <h2 id="contact-details-heading"><%= c.details %></h2>
+      <dl class="contact-details">
+      <% for(const key of ['primary_email','secondary_email']) { if(organization[key]) { %><div><dt><%= c[key] %></dt><dd><a class="text-link" href="mailto:<%= organization[key] %>"><%= organization[key] %></a></dd></div><% } } %>
+      <% if(organization.phone) { %><div><dt><%= c.contactPhone %></dt><dd><a class="text-link" href="tel:<%= organization.phone.replace(/[^+\d]/g,'') %>"><%= organization.phone %></a></dd></div><% } %>
+      <% if(organization.whatsapp) { %><div><dt><%= c.whatsapp %></dt><dd><a class="text-link" href="https://wa.me/<%= organization.whatsapp.replace(/\D/g,'') %>"><%= organization.whatsapp %></a></dd></div><% } %>
+      <% const address=[organization.address,organization.city,organization.country].filter(Boolean).join('\n'); if(address) { %><div><dt><%= c.address %></dt><dd class="preserve-lines"><%= address %></dd></div><% } %>
+      </dl>
+      <% if(organization.map_url) { %><a class="button-secondary mt-6" href="<%= organization.map_url %>"><%= c.map %> ↗</a><% } %>
+      <% if(!address && !['primary_email','secondary_email','phone','whatsapp','map_url'].some(key=>organization[key])) { %><p class="text-muted"><%= c.empty %></p><% } %>
+    </section>
+    <section id="feedback" class="contact-card" aria-labelledby="feedback-heading">
+      <h2 id="feedback-heading"><%= c.form %></h2><p><%= c.explanation %></p><p class="text-muted contact-privacy"><%= c.privacy %></p>
+      <% if(success) { %><p class="form-alert" role="status"><%= c.success %></p><% } %>
+      <% if(notice || Object.keys(errors).length) { %><div class="form-alert" role="alert"><p><%= notice || c.errors %></p>
+        <% if(Object.keys(errors).length) { %><ul><% for(const key of Object.keys(errors)) { %><li><a href="#contact-<%= key %>"><%= c[key] %>: <%= c[errors[key]] %></a></li><% } %></ul><% } %>
+        <% if(notice) { %><a class="text-link" href="<%= localePrefix %>/contact#feedback"><%= c.retry %></a><% } %>
+      </div><% } %>
+      <% if(ready) { %><form method="post" action="<%= localePrefix %>/contact#feedback" class="contact-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="_submission" value="<%= submissionToken %>">
+        <div class="contact-trap" aria-hidden="true"><label for="contact-website">Leave empty</label><input id="contact-website" name="website" tabindex="-1" autocomplete="off"></div>
+        <div class="contact-fields"><% for(const field of fields) { const error=errors[field.key]; %>
+          <div class="settings-field <%= ['subject','message'].includes(field.key)?'contact-wide':'' %>"><label for="contact-<%= field.key %>"><%= c[field.key] %><%= field.required?' *':'' %></label>
+            <% if(field.type==='textarea') { %><textarea id="contact-<%= field.key %>" name="<%= field.key %>" rows="7" maxlength="<%= field.max %>" required<% if(error) { %> aria-invalid="true" aria-describedby="contact-<%= field.key %>-error"<% } %>><%= values[field.key]||'' %></textarea>
+            <% } else { %><input id="contact-<%= field.key %>" name="<%= field.key %>" type="<%= field.type %>" maxlength="<%= field.max %>" autocomplete="<%= field.autocomplete %>" value="<%= values[field.key]||'' %>"<% if(field.required) { %> required<% } %><% if(error) { %> aria-invalid="true" aria-describedby="contact-<%= field.key %>-error"<% } %>><% } %>
+            <% if(error) { %><p class="contact-error" id="contact-<%= field.key %>-error"><%= c[error] %></p><% } %>
+          </div>
+        <% } %></div><button type="submit" class="button-primary"><%= c.submit %> <span aria-hidden="true">↗</span></button>
+      </form><% } else { %><p class="form-alert"><%= c.unavailable %></p><% } %>
+    </section>
+  </div>
+</main>
+<%- include('../partials/footer') %>

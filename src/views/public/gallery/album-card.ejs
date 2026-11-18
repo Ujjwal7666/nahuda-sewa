@@ -1,0 +1,10 @@
+<% const cover=item.cover_image||item.images[0]?.image,count=item._count.images; %>
+<a class="gallery-album-card" id="album-<%= item.id %>" href="<%= localePrefix+'/gallery/'+item.id %>" aria-labelledby="album-title-<%= item.id %>" data-gallery-stagger="<%= Math.min(index,8) %>">
+  <div class="gallery-cover gallery-image-shell" data-image-shell>
+    <span class="gallery-image-fallback"><%= labels.unavailable %></span>
+    <% if(cover) { %><img class="album-cover gallery-load-image" src="<%= assetUrl(cover) %>" width="<%= cover.width %>" height="<%= cover.height %>" alt="" loading="lazy" decoding="async"><% } %>
+    <span class="gallery-count"><%= count %> <%= count===1?labels.photo:labels.photos %></span>
+    <span class="gallery-view" aria-hidden="true"><%= labels.view %> <span>→</span></span>
+  </div>
+  <div class="gallery-album-copy"><% if(item.date) { %><time datetime="<%= dateInput(item.date) %>"><%= formatDate(item.date) %></time><% } %><h2 id="album-title-<%= item.id %>"><%= contentText(item,'title',locale) %></h2><% if(contentText(item,'description',locale)) { %><p class="gallery-description"><%= contentText(item,'description',locale) %></p><% } %></div>
+</a>

@@ -1,0 +1,14 @@
+<%- include('partials/start') %>
+<h1 class="text-3xl font-bold mt-3">Welcome, <%= admin.name %>.</h1>
+<p class="text-muted mt-2 admin-identity">Signed in as <%= admin.email %></p>
+<% if (success) { %><p class="form-alert" role="status"><%= success %></p><% } %>
+<section class="admin-notice mt-8">
+  <h2 class="text-xl font-semibold">Your Admin account is ready.</h2>
+  <p class="text-muted mt-3">Manage organization settings, About content, Vision &amp; Mission, Team and Committee under Organization. Manage Our Work and Core Activities as separate modules under Content, alongside activity categories, News, Gallery and Testimonials. Review submitted donation receipts and Contact / Feedback under Messages. Use Account to change your password or sign out.</p>
+  <a href="/admin/organization/settings" class="button-secondary mt-6">Organization Settings</a>
+  <a href="/admin/content" class="button-secondary mt-6">Content CMS</a>
+  <a href="/admin/messages/donation-receipts" class="button-secondary mt-6">Donation Receipts</a>
+  <a href="/admin/messages/contact-feedback" class="button-secondary mt-6">Contact / Feedback</a>
+  <a href="/admin/account/change-password" class="button-secondary mt-6">Change password</a>
+</section>
+<%- include('partials/end') %>

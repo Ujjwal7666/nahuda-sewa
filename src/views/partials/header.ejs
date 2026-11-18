@@ -1,0 +1,22 @@
+<a href="#main" class="skip-link"><%= t.skip %></a>
+<header class="site-header">
+  <div class="page-width header-grid">
+    <a href="<%= homeUrl %>" class="identity" aria-label="<%= name %> — <%= t.home %>">
+      <% if (organization.primary_logo) { %><img src="<%= organization.primary_logo %>" width="68" height="68" alt="" class="brand-logo header-logo"><% } %>
+      <span class="brand-wordmark"><strong class="brand-name" lang="<%= locale %>"><%= organization.names[locale] %></strong><span class="brand-name-en" lang="<%= locale === 'en' ? 'ne' : 'en' %>"><%= organization.names[locale === 'en' ? 'ne' : 'en'] %></span></span>
+    </a>
+    <%- include('navigation') %>
+    <div class="header-controls">
+      <div class="language-switch" aria-label="<%= t.language %>">
+        <% if (locale === 'en') { %>
+          <span lang="en" aria-current="true">EN</span><a href="<%= alternateUrl %>" lang="ne" hreflang="ne" data-language-link>नेपाली</a>
+        <% } else { %>
+          <a href="<%= alternateUrl %>" lang="en" hreflang="en" data-language-link>EN</a><span lang="ne" aria-current="true">नेपाली</span>
+        <% } %>
+      </div>
+      <button type="button" class="menu-toggle" data-menu-toggle aria-controls="public-navigation" aria-expanded="false" aria-label="<%= t.menu %>" data-open-label="<%= t.menu %>" data-close-label="<%= t.close %>" hidden>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>

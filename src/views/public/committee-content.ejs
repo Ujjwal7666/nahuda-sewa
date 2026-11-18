@@ -1,0 +1,22 @@
+<% if(!branches.length) { %><p class="form-alert"><%= labels.empty %></p><% } %>
+<% if(branches.length) { const navigationLabel=locale==='ne'?'समितिका शाखाहरू':'Committee branches'; %>
+<nav class="committee-branch-nav" aria-label="<%= navigationLabel %>">
+  <p class="eyebrow"><%= navigationLabel %></p>
+  <div class="committee-branch-links"><% for(const branch of branches) { %><a class="button-secondary" href="#committee-branch-<%= branch.id %>"><%= contentText(branch,'name',locale) %></a><% } %></div>
+</nav><% } %>
+<div class="committee-sections"><% for(const branch of branches) { %>
+<section class="committee-section" aria-labelledby="committee-branch-<%= branch.id %>">
+  <header class="committee-branch-heading"><h2 id="committee-branch-<%= branch.id %>" tabindex="-1"><%= contentText(branch,'name',locale) %></h2><% const description=contentText(branch,'description',locale); if(description) { %><p class="preserve-lines"><%= description %></p><% } %></header>
+  <% if(!branch.members.length) { %><p class="text-muted"><%= labels.empty %></p><% } else { %>
+  <div class="committee-members"><% for(const member of branch.members) { const name=contentText(member,'name',locale); const segments=new Intl.Segmenter(locale,{granularity:'grapheme'}); const initials=name.trim().split(/\s+/u).filter(Boolean).slice(0,2).map(word=>[...segments.segment(word)][0]?.segment||'').join('').toLocaleUpperCase(locale); %>
+    <article class="organization-card committee-member" data-member-card>
+      <div class="committee-portrait"><div class="member-photo-fallback committee-initials" aria-hidden="true"><span><%= initials %></span></div><% if(member.photo) { %><img class="member-photo" src="<%= assetUrl(member.photo) %>" alt="<%= name %>" width="<%= member.photo.width %>" height="<%= member.photo.height %>" loading="lazy" decoding="async"><% } %></div>
+      <div class="committee-member-details"><h3><%= name %></h3><% for(const field of ['position','committee_role','introduction']) { const text=contentText(member,field,locale); if(text.trim()) { %><p class="<%= field==='introduction'?'preserve-lines member-introduction':field==='position'?'member-position':'member-role' %>"><%= text %></p><% } } %></div>
+    </article>
+  <% } %></div><% } %>
+</section><% } %></div>
+<% if(lifeMembers.length) { %>
+<section class="committee-section life-members-section" aria-labelledby="life-members-heading">
+  <header class="committee-branch-heading"><p class="eyebrow"><%= locale==='ne'?'विशेष सम्मान':'Special recognition' %></p><h2 id="life-members-heading"><%= locale==='ne'?'आजीवन सदस्य':'Life Members' %></h2></header>
+  <ol class="life-members-list"><% for(let index=0;index<lifeMembers.length;index++) { const member=lifeMembers[index]; %><li><span class="life-member-number"><%= index+1 %>.</span><span><%= contentText(member,'name',locale) %></span></li><% } %></ol>
+</section><% } %>
