@@ -6,7 +6,7 @@ This package is a separate copy of the current Nahuda Sewa application. Stack: N
 
 The server entry is `src/server.js`; it creates the Express app in `src/app.js`. The application root is the directory containing `package.json`, `prisma.config.ts`, `src/`, `public/`, and `prisma/`. The package requires Node `>=24.0.0 <25` as declared by its actual `package.json`; local verification used Node 24.19.0 and npm 11.17.0.
 
-Nest Nepal publicly advertises Node.js/Express hosting, cPanel and MySQL for its Node hosting plans ([Nest Nepal Node.js hosting](https://nestnepal.com/nodejs-hosting-in-nepal/)). Its public page does not establish that the account/plan assigned to this project offers Node 24.x, a compatible Prisma/MariaDB adapter runtime, adequate process/memory limits, or the required writable persistent storage. Confirm those exact capabilities in the account before proceeding. No cPanel account was accessed.
+Nest Nepal publicly advertises Node.js/Express hosting, cPanel and MySQL for its Node hosting plans ([Nest Nepal Node.js hosting](https://nestnepal.com/nodejs-hosting-in-nepal/)). The owner has confirmed Node 24.22.3 and MariaDB 10.11.20 in the account and created the empty production database and user. Prisma/native `sharp` compatibility, process/memory limits, and persistent-storage behavior still need verification. This guide was not based on direct account access by the reviewer.
 
 ## Installation and local package commands
 
@@ -77,7 +77,7 @@ Tests executed on the isolated local package and exact boundaries are recorded i
 
 ## Backup and rollback
 
-Before every schema or content deployment, back up MySQL and both storage directories to a restricted, durable location. Verify the backup exists and that a restoration rehearsal works in a separate database/directory. Keep the prior application version available. A code rollback does not reverse a migration; restore a database only under an approved recovery plan after assessing writes since the backup. Keep `storage/` across code replacements. Details: [DATABASE_DEPLOYMENT.md](DATABASE_DEPLOYMENT.md) and [UPLOAD_STORAGE.md](UPLOAD_STORAGE.md).
+Before every schema or content deployment, back up MySQL and both `STORAGE_ROOT/uploads/` and `STORAGE_ROOT/receipts/` directories (or the default app-root `storage/` when unset) to a restricted, durable location. Verify the backup exists and that a restoration rehearsal works in a separate database/directory. Keep the prior application version available. A code rollback does not reverse a migration; restore a database only under an approved recovery plan after assessing writes since the backup. Preserve the configured external storage root across code replacements. Details: [DATABASE_DEPLOYMENT.md](DATABASE_DEPLOYMENT.md) and [UPLOAD_STORAGE.md](UPLOAD_STORAGE.md).
 
 ## Common failures
 
@@ -87,6 +87,6 @@ Before every schema or content deployment, back up MySQL and both storage direct
 | cPanel shows no listener / proxy error | Confirm its assigned `PORT`, startup file `src/server.js`, application root, and restart action. |
 | Prisma client initialization error | Run `npm ci --include=dev` and `npm run db:generate` using Node 24.x before pruning dev dependencies. |
 | MySQL access denied / timeout | Verify cPanel database host, database/user naming, grants, URL-encoded credentials, and connection restrictions. Do not use the loopback-only local migration helper. |
-| Upload fails or disappears | Verify persistent writable `storage/uploads/` and `storage/receipts/`, directory ownership/permissions, quota, request size limit, and backup/restore alignment. |
+| Upload fails or disappears | Verify `STORAGE_ROOT`, its `uploads/` and `receipts/` children, directory ownership/permissions, quota, request size limit, and backup/restore alignment. |
 | Secure cookie missing | Access via HTTPS and confirm the documented one-hop proxy behavior. |
 | CSS missing after checkout | Confirm `public/assets/css/app.css` is present; it is generated and included in this package. |

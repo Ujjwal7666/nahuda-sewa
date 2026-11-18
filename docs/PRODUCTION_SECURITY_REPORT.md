@@ -1,7 +1,7 @@
 # Production package security report
 
 **Review date:** 2026-11-18 (Asia/Katmandu)  
-**Scope:** Current locked dependency set, package contents, source configuration, and current npm advisory data. No host account, production database, live endpoint, or private `.env` was accessed.  
+**Scope:** Current locked dependency set, package contents, source configuration, and current npm advisory data. No cPanel credentials or private `.env` were accessed. Owner-provided account screenshots/status were used; the app has not connected to the production database.  
 **Package:** `deployment/production/`; no `node_modules`, database dump, or uploaded media is included.
 
 ## Executive status
@@ -54,10 +54,10 @@ Because the earlier documentation omitted individual CVE/GHSA identifiers, insta
 | ID | Severity | Finding | Action / blocker |
 |---|---|---|---|
 | PKG-SEC-01 | High | The dev-only Tailwind/picomatch chain still has a High advisory. | Release/build security sign-off blocker as above; production-only dependency set is clean. |
-| PKG-SEC-02 | High until confirmed | Nest Nepal's exact cPanel plan has not been verified for Node 24.x, Prisma client/adapter compatibility, application port/proxy behavior, disk persistence, request limits, or connection quotas. | Confirm with the assigned account/provider before deployment. Public provider marketing confirms Node.js/Express/cPanel/MySQL offerings but does not guarantee this account's exact Node version/capabilities. |
+| PKG-SEC-02 | High until confirmed | Node 24.22.3 and MariaDB 10.11.20 are available in the account, but Prisma/Sharp runtime compatibility, port/proxy behavior, disk persistence, request limits, and connection quotas are not verified. | Confirm the remaining account capabilities and perform app/database checks before deployment. |
 | PKG-SEC-03 | Medium | One-hop Express proxy trust assumes a specific TLS/proxy topology. | Verify forwarding chain and Secure-cookie behavior in staging; do not increase trust blindly. |
 | PKG-SEC-04 | Medium | Contact/receipt retention and production backup retention require owner policy. | Keep storage private, define retention/access controls, and test backup restoration before launch. |
-| PKG-SEC-05 | Medium | Application code stores uploaded media under app-root `storage/`; no configurable persistent path exists. | Preserve the directory through deployments; use a provider-approved persistent mapping only after verifying it. |
+| PKG-SEC-05 | Medium | `STORAGE_ROOT` now supports a separate upload/receipt root, but cPanel storage creation, permissions, environment configuration, and persistence across redeploys are not yet verified. | Create a root outside the app/Git/public directories, configure the variable, and verify permissions/persistence before enabling CMS uploads. |
 
 ## Verification commands and results
 
@@ -71,6 +71,7 @@ Run from the production package root:
 - `npm run db:validate`: succeeded; no database connection was attempted.
 - `npm test`: 53 passed, 0 failed, 11 database-backed wrappers skipped. The package's MySQL integration runner was not run because no isolated DB URL was configured in this package; no development or production DB was contacted.
 - `npm run build`: succeeded with Tailwind CLI 4.3.5; package CSS output is 99,910 bytes.
+- The above install/test/build results predate the approved `STORAGE_ROOT` source change. After that change, `node --check` passed for `src/config/storage.js`, `src/config/env.js`, `src/services/organization-settings.js`, `src/services/donation-receipts.js`, and `src/app.js`. The full tests and build have not been rerun after the change.
 - `npm prune --omit=dev` and `npm ls --omit=dev --depth=0`: succeeded; production dependency tree contains required runtime packages only. The generated application Prisma client loaded with the existing MariaDB adapter after pruning.
 - Independent package check: 246 relative JavaScript imports, 83 EJS includes, and 14 static asset references resolved; all 58 EJS templates compiled. No unresolved paths were reported.
 - Runtime: `npm start` from this package started in production mode with a synthetic local URL/secret; `/robots.txt` and `/assets/css/app.css` returned 200. No database query/connection was made. With no database in test mode, `/`, `/ne`, `/about`, `/ne/about/team`, `/news`, `/gallery`, `/contact`, and `/ne/donate` rendered with 200 responses.

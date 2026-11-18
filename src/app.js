@@ -1,6 +1,7 @@
 import {programsController} from './controllers/programs-controller.js';
 import express from 'express';
 import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { readConfig } from './config/env.js';
 import { localeMiddleware } from './middleware/locale.js';
 import { notFound, errorHandler } from './middleware/errors.js';
@@ -87,10 +88,12 @@ export function createApp(config = readConfig(), dependencies) {
   if (!dependencies && config.databaseUrl) {
     const db = createDatabase(config.databaseUrl);
     app.locals.db = db;
-    dependencies = { auth: authenticationService(db, config), store: new PrismaSessionStore(db, config.sessionLifetimeMs), settings: organizationSettingsService(db) };
-    dependencies.receipts = donationReceiptService(db,config);
-    dependencies.content = fixedContentService(db);
-    dependencies.mediaContent = mediaContentService(db);
+    const uploadsDirectory = config.storageRoot ? join(config.storageRoot, 'uploads') : undefined;
+    const receiptsDirectory = config.storageRoot ? join(config.storageRoot, 'receipts') : undefined;
+    dependencies = { auth: authenticationService(db, config), store: new PrismaSessionStore(db, config.sessionLifetimeMs), settings: organizationSettingsService(db, uploadsDirectory) };
+    dependencies.receipts = donationReceiptService(db,config,receiptsDirectory);
+    dependencies.content = fixedContentService(db,uploadsDirectory);
+    dependencies.mediaContent = mediaContentService(db,uploadsDirectory);
     dependencies.receiptStore = new PrismaSessionStore(db,receiptLifetimeMs,'donation');
     dependencies.messages = contactSubmissionService(db,config);
     dependencies.contactStore = new PrismaSessionStore(db,contactLifetimeMs,'contact');

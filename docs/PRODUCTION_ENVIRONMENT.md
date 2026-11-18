@@ -12,6 +12,7 @@ All names below were verified in `src/config/env.js` or `scripts/create-admin.js
 | `PUBLIC_ORIGIN` | Absolute origin used for canonical/hreflang metadata, sitemap and social image URLs. | Optional in code; strongly recommended for production | `https://example.invalid`; origin only, no path, credentials, query or fragment. Use the actual HTTPS domain. |
 | `DATABASE_URL` | Prisma/MariaDB adapter connection to MySQL. Required at production startup. | Yes | `mysql://DB_USER:URL_ENCODED_PASSWORD@DB_HOST:3306/DB_NAME`; use the host value supplied by cPanel and URL-encode special characters in credentials. |
 | `SESSION_SECRET` | Signs Admin/contact/donation session cookies and derives rate-limit keys. | Yes | Replace the placeholder with at least 32 random bytes. Never reuse the example or commit the real value. |
+| `STORAGE_ROOT` | Absolute persistent storage directory. The app uses its `uploads/` and `receipts/` children. | Optional; recommended for hosting | Example only: `/absolute/path/to/nahuda-sewa-storage`. If unset, the app keeps the prior `<application-root>/storage/` behavior. Must be an absolute path. |
 | `SESSION_LIFETIME_MINUTES` | Admin session lifetime; accepted range 5–1440. | Optional | `480` (default). |
 | `LOGIN_WINDOW_MINUTES` | Admin login rate-limit window; accepted range 1–60. | Optional | `15` (default). |
 | `LOGIN_IP_MAX` | Maximum login attempts per IP in the window; range 1–100. | Optional | `20` (default). |
@@ -38,7 +39,7 @@ The provisioning command refuses an existing email instead of overwriting that a
 ## Values that are not application variables
 
 - SMTP variables in the root development `.env.example` are reserved for a future feature. The current application does not send email, so no SMTP values are included here.
-- There is no upload-root environment variable. The application uses paths relative to its own source under `storage/uploads/` and `storage/receipts/`.
+- `STORAGE_ROOT` is the optional absolute root for persistent uploads and receipts. If unset, paths remain under `<application-root>/storage/` for backward compatibility.
 - There are no separate `DB_HOST`, `DB_USER`, or `DB_PASSWORD` variables; the runtime reads only `DATABASE_URL`.
 - `ACTIVITY_MIGRATION_DATABASE_URL`, `COMMITTEE_MIGRATION_DATABASE_URL`, and `AUTH_TEST_DATABASE_URL` are test-only variables. They are not production configuration.
 

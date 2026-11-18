@@ -1,44 +1,46 @@
 # Persistent media and upload storage
 
-## Actual paths and URL handling
+## Current implementation
 
-The application resolves directories relative to its installed source, not from environment variables:
+`STORAGE_ROOT` is an optional absolute filesystem path. When configured, the app stores:
 
-- Public CMS image files: `<application-root>/storage/uploads/` (`src/services/organization-settings.js` exports `uploadRoot`).
-- Private donor receipt files: `<application-root>/storage/receipts/` (`src/services/donation-receipts.js` exports `receiptRoot`).
-- Public image URL: `/media/<UUID>.png`. Express looks up the UUID key in `MediaAsset` and sends only a referenced file from the uploads root. Upload files are not served by `express.static`.
-- Receipt URL: authenticated Admin route only; receipt files are outside the public MediaAsset route and must remain private.
+- Public CMS image files in `<STORAGE_ROOT>/uploads/`.
+- Private donation receipt files in `<STORAGE_ROOT>/receipts/`.
 
-There is currently no `UPLOAD_DIR`, `MEDIA_DIR`, or receipt-path environment setting. The package preserves the existing relative layout under `storage/`; no app source or upload behavior was changed.
+If `STORAGE_ROOT` is unset, the app keeps the previous locations under `<application-root>/storage/`. The app validates a configured path as absolute. Existing function-level directory overrides remain available for isolated tests.
 
-## Create directories and set access
+The production cPanel account home path reported by the owner is `/home1/nahudase`; the app root is `/home1/nahudase/nahuda-sewa-app`. The proposed external storage root is `/home1/nahudase/nahuda-sewa-storage`, outside both `public_html` and the Git checkout. Verify this path is accepted and writable in the account before configuring it. No cPanel directory has been created yet.
 
-Create both directories under the stable cPanel application root before the first upload. Make the Node application account the owner. Use restrictive permissions compatible with the cPanel process; a starting point is `0750` for `storage/uploads/` and `0700` for `storage/receipts/`, with files readable/writable by the application owner. Confirm that the process can create, read, replace and remove files. Do not make either folder `public_html`, a symlink into a web-served static directory, or world-writable. Confirm actual behavior under the assigned account; shared-host ACL/umask was not tested.
+## URLs and privacy
 
-The app process serves public media through its database-backed handler. Protect receipt files at the OS level as well as through Admin authorization. Verify that backup operators are separately authorized.
+- Public images retain their existing `/media/<UUID>.png` URLs. Express looks up each media key in the database and serves only referenced files from the uploads directory. Raw storage is not mounted as a static directory.
+- Donation receipts remain in a separate directory and are returned only by authenticated Admin routes. Never point the receipts directory at `public_html`, expose it with `express.static`, or make it world-readable.
+- Changing `STORAGE_ROOT` does not change database media keys or public URLs.
+
+## Create the directories in cPanel
+
+After the app files are installed and before enabling uploads:
+
+1. Create the chosen root outside the application root and `public_html`.
+2. Inside it, create `uploads/` and `receipts/`.
+3. Ensure the Node application account owns them and can create, read, replace, and remove files.
+4. Start with `0750` for `uploads/` and `0700` for `receipts/`, if supported by cPanel. Do not use `0777`; follow the provider's ACL/permission requirements if they differ.
+5. Set the cPanel app environment variable `STORAGE_ROOT` to the absolute path of the parent directory only (not the `uploads` or `receipts` child). For the proposed account path, the value would be `/home1/nahudase/nahuda-sewa-storage`.
+6. Apply the environment change using cPanel's supported restart/redeploy action only after the app package is present and configured. Verify the app logs and a later approved test upload.
+
+Do not set `STORAGE_ROOT` to a relative path. Do not create these directories inside the repository and then set the root to the app path if the goal is separation from replaceable code.
 
 ## Accepted media and processing
 
-- Source upload types: PNG, JPEG/JPG, and WebP; file extension, MIME and image signature must agree.
+- Source upload types: PNG, JPEG/JPG, and WebP; file extension, MIME type, and image signature must agree.
 - Per-file source limit: 10 MiB. Decoded image limit: 16 megapixels; animated/multipage images are rejected.
 - Images are decoded and normalized to PNG, metadata is removed by re-encoding, and random UUID filenames are created exclusively. Normalized output is bounded to 12 MiB.
 - Favicon output is limited to 256px; other ordinary CMS images are resized within 2400px. Donation QR and receipt images are not resized to preserve scan/read quality.
-- Gallery batch upload allows up to five photos per request, each up to 10 MiB. Check host/proxy body size, memory and timeout limits for the combined request plus fields before enabling batch use.
-- Receipts use a separate store and are visible to authorized Admin only. Do not place receipt copies in the uploads folder.
+- Gallery batch upload allows up to five photos per request. Confirm host/proxy request-size, memory, and timeout limits before enabling batch use.
+- Receipts use their own private directory and are visible only to authorized Admin users.
 
-## Persistence across releases
+## Persistence and Git updates
 
-The application currently expects the `storage/` directory under the app root. Therefore:
+Keep the external storage root out of the Git repository. Git updates should replace application files without deleting `/home1/nahudase/nahuda-sewa-storage`. Before the first upload, confirm that cPanel's chosen Git retrieval/redeploy method does not clean files outside the repository and that the app process can write to the external path.
 
-1. Prefer a stable application root and deploy/update source in place while preserving `storage/`.
-2. If releases are replaceable directories, ask the host whether a persistent directory outside the release can be mounted or symlinked to `<application-root>/storage`; verify Node's filesystem access and cPanel security rules first. No path override exists in application configuration.
-3. If the host does not support a safe persistent mapping, retain `storage/` during every deployment and explicitly exclude it from clean/replacement steps. A new checkout/package copy must not overwrite it.
-4. Before deploying, take a database plus media backup. After deployment, compare media file counts and database references and test one public image and a private receipt access denial as authorized.
-
-The two `.gitkeep` markers in this package preserve empty folders. `.gitignore` excludes content files under both paths. Do not copy local development uploads, receipts, or backups into this package.
-
-## Backup and restoration
-
-Back up `storage/uploads/` with the MySQL `MediaAsset` rows and their owner records. Back up `storage/receipts/` with receipt submission records as private personal data. Use a restricted durable/offsite location outside the app root, encrypt where supported, and apply the owner-approved retention policy. Keep database and file snapshot timestamps/identifiers together.
-
-To restore, stop writes or follow the provider's consistency-safe process, restore the matching database and directory snapshots, set owner and restrictive directory permissions, then verify expected UUID files exist, a representative public `/media/<key>` works, and receipt routes remain authenticated. Do not expose a raw receipt filesystem path or make receipt files static. Rehearse restore in a separate environment before relying on it.
+Back up the database and both storage subdirectories together. The database references media keys; restoring only one side can cause missing or orphaned files. Receipt backups contain private donor information and need restricted access and retention. Rehearse restoration into separate database and filesystem paths before relying on a backup.

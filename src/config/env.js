@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { resolveStorageRoot } from './storage.js';
 
 dotenv.config({ quiet: true });
 
@@ -23,6 +24,7 @@ export function readConfig(env = process.env) {
     return Number(value);
   };
   const databaseUrl = env.DATABASE_URL || '';
+  const storageRoot = resolveStorageRoot(env.STORAGE_ROOT);
   let publicOrigin = `http://${host === '::1' ? '[::1]' : host}:${rawPort}`;
   if (env.PUBLIC_ORIGIN) {
     try {
@@ -37,7 +39,7 @@ export function readConfig(env = process.env) {
   if (nodeEnv === 'production' && (!databaseUrl || !sessionSecret)) {
     throw new Error('Production requires DATABASE_URL and SESSION_SECRET.');
   }
-  return Object.freeze({ nodeEnv, port: Number(rawPort), host, databaseUrl, sessionSecret, publicOrigin,
+  return Object.freeze({ nodeEnv, port: Number(rawPort), host, databaseUrl, sessionSecret, publicOrigin, storageRoot,
     sessionLifetimeMs: integer('SESSION_LIFETIME_MINUTES', 480, 5, 1440) * 60000,
     loginWindowMs: integer('LOGIN_WINDOW_MINUTES', 15, 1, 60) * 60000,
     loginIpMax: integer('LOGIN_IP_MAX', 20, 1, 100),

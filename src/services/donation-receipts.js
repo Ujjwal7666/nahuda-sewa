@@ -1,11 +1,12 @@
 import { mkdir, open, unlink } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { receiptRoot } from '../config/storage.js';
 import { createHash } from 'node:crypto';
 import { decodeAsset, safeKey } from './image-assets.js';
 import { consumeRateLimit } from './rate-limit.js';
 
-export const receiptRoot = fileURLToPath(new URL('../../storage/receipts/', import.meta.url));
+export { receiptRoot };
+
 export function donationReceiptService(db, config, directory = receiptRoot) {
   const root = resolve(directory);
   return {

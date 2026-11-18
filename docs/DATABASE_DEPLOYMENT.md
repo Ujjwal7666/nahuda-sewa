@@ -52,7 +52,7 @@ If a later owner-approved transfer of existing content is required:
 1. Agree in writing on an allowlist of public organization-content tables/records and associated media. Exclude Admin accounts (provision them separately), Admin sessions, rate-limit rows, contact submissions and donation receipts unless a separate approved retention/legal process explicitly requires transfer.
 2. Back up the source and target first; rehearse the exact allowlisted export/import on an isolated database with no live personal data.
 3. Preserve primary keys or build an explicit source-to-target ID mapping, paired `_en`/`_ne` values, status/order/slug/date fields, foreign-key relations and media owner references. Never import a partial relational subset that leaves broken foreign keys or MediaAsset references.
-4. Transfer only approved public media from the matching source records, through a controlled manifest, into `storage/uploads/`. Do not copy `storage/receipts/` as ordinary CMS media.
+4. Transfer only approved public media from the matching source records, through a controlled manifest, into `STORAGE_ROOT/uploads/` (or `storage/uploads/` when unset). Do not copy `STORAGE_ROOT/receipts/` as ordinary CMS media.
 5. Verify record counts, bilingual field presence, active/published states, indexes/FKs, slugs, image keys and public pages in staging. Keep a rollback backup and record checksums for the approved media set.
 6. Import to production only in a separately approved maintenance step. This package-preparation task did not export or import any database content.
 
@@ -66,7 +66,7 @@ Never seed a default username/password or copy development Admin accounts.
 
 ## Backup, export, restore
 
-- Back up MySQL and `storage/uploads/` plus `storage/receipts/` together. The database references media keys, so a database-only restore may produce missing images; media-only restore may produce unreferenced files. Receipts contain private donor information and must have stricter access controls.
+- Back up MySQL and `STORAGE_ROOT/uploads/` plus `STORAGE_ROOT/receipts/` together (or the corresponding app-root `storage/` paths when unset). The database references media keys, so a database-only restore may produce missing images; media-only restore may produce unreferenced files. Receipts contain private donor information and must have stricter access controls.
 - Use the provider's cPanel backup/export tool or an approved MySQL utility with credentials prompted privately (not in shell history). Example full database backup, run only after an approved backup window and with placeholder values replaced:
 
   ```text

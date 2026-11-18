@@ -1,12 +1,13 @@
 import { mkdir, open, unlink } from 'node:fs/promises';
 import { resolve, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { uploadRoot } from '../config/storage.js';
 import { AssetError as SettingsError, decodeAsset, safeKey } from './image-assets.js';
 import { assetSlots } from '../config/organization-fields.js';
 import { branding } from '../config/branding.js';
 import { removeUnreferencedMedia } from './media-references.js';
 
-export const uploadRoot = fileURLToPath(new URL('../../storage/uploads/', import.meta.url));
+export { uploadRoot };
+
 export const assetInclude = Object.fromEntries(assetSlots.map(({key}) => [key, true]));
 export { AssetError as SettingsError, decodeAsset, safeKey } from './image-assets.js';
 export const assetUrl = (asset) => asset ? `/media/${asset.storage_key}` : null;
